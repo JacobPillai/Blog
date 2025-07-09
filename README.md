@@ -64,6 +64,8 @@ A key challenge was ensuring the placeholder content matched the visual intent o
 
 The result is a polished, visually appealing, and responsive blog page that closely matches the target design. The development process involved a combination of initial setup, comprehensive page linking, iterative design refinement based on visual feedback, and careful content curation to achieve the final look.
 
+https://jacobpillai.github.io/Blog/ - Live Demo
+
 photo links:
 Photo by Lisa from Pexels: https://www.pexels.com/photo/eyeglasses-beside-bowl-of-food-and-magazine-on-table-1438190/ 
 Photo by Benni Fish: https://www.pexels.com/photo/display-rack-with-newspapers-on-street-12418421/
