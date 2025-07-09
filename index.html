@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizone - Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav> <!---nav bar-containing logo, links, search bar, language, login and signup buttons-->
+            <a href="index.html" target="_blank" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <ul>
+                <li><a href="pages/hotel.html" target="_blank">Hotel</a></li>
+                <li><a href="pages/Flight.html" target="_blank">Flight</a></li>
+                <li><a href="pages/Train.html" target="_blank">Train</a></li>
+                <li><a href="pages/travel.html" target="_blank">Travel</a></li>
+                <li><a href="pages/CarRental.html" target="_blank">Car Rental</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search destination...">
+                    <button><i class="fa fa-search"></i></button>
+                </div>
+                <div class="language">EN</div>
+                <a href="pages/Login.html" class="login">Log In</a>
+                <a href="pages/signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hiker on a mountain" class="hero-bg">
+            <div class="hero-content">
+                <span class="tag">Destination</span>
+                <h1>Exploring the Wonders of Hiking</h1>
+                <p>An iconic landmarks, this post unveils the secrets that make this destination a traveler's paradise.</p>
+                <div class="author-info">
+                    <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Theodore Reginald">
+                    <span>Theodore Reginald</span>
+                    <span class="date">24 Jan 2024</span>
+                    <span class="read-time">10 mins read</span>
+                </div>
+                <div class="hero-indicators">
+                    <span class="active"></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="blog-section">
+            <div class="blog-intro">
+                <h2>Blog</h2>
+                <p>Here, we share travel tips, destination guides, and stories that inspire your next adventure.</p>
+            </div>
+
+            <div class="blog-filters">
+                <div class="categories">
+                    <button class="active">All</button>
+                    <button>Destination</button>
+                    <button>Culinary</button>
+                    <button>Lifestyle</button>
+                    <button>Tips & Hacks</button>
+                </div>
+                <div class="sort-by">
+                    <label for="sort">Sort by:</label>
+                    <select id="sort">
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="blog-grid">
+                                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1500835556837-99ac94a94552?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Desert landscape">
+                    <div class="post-content">
+                        <span class="tag">Destination</span>
+                        <h3>Unveiling the Secrets Beyond the Tourist Trails</h3>
+                        <div class="post-meta">
+                            <span>30 Jan 2024</span> &bull; <span>10 mins read</span>
+                        </div>
+                        <p>Dive into the local culture, discover hidden spots, and experience the authentic charm that often...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Jacob Pill">
+                            <span>Jacob Pill</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Fashion items">
+                    <div class="post-content">
+                        <span class="tag">Lifestyle</span>
+                        <h3>A Fashionista's Guide to Wanderlust</h3>
+                        <div class="post-meta">
+                            <span>29 Jan 2024</span> &bull; <span>5 mins read</span>
+                        </div>
+                        <p>Dive into the intersection of fashion and travel as we explore the wardrobes of globetrotters. Pr...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Ming shuen">
+                            <span>Ming shuen</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Gadgets">
+                    <div class="post-content">
+                        <span class="tag">Tips & Hacks</span>
+                        <h3>Top 5 Apps and Gadgets That Will Transform Your Journeys</h3>
+                        <div class="post-meta">
+                            <span>26 Jan 2024</span> &bull; <span>15 mins read</span>
+                        </div>
+                        <p>Guide to must-have apps and gadgets, from nav...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="Lee Yi Shi">
+                            <span>Lee Yi Shin</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Food dish">
+                    <div class="post-content">
+                        <span class="tag">Culinary</span>
+                        <h3>Savoring Mozaic Retro Gastronomic Delights</h3>
+                        <div class="post-meta">
+                            <span>24 Jan 2024</span> &bull; <span>10 mins read</span>
+                        </div>
+                        <p>Wander through ancient streets, visit iconic landmarks, and immerse yourself in the space th...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/4.jpg" alt="Jonathan">
+                            <span>Jonathan</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1508672019048-805c876b67e2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Ancient ruins">
+                    <div class="post-content">
+                        <span class="tag">Destination</span>
+                        <h3>Journey Through Time</h3>
+                        <div class="post-meta">
+                            <span>20 Jan 2024</span> &bull; <span>8 mins read</span>
+                        </div>
+                        <p>Join us on an exploration of time as we uncover the secrets of ancient ruins and immerse you...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/5.jpg" alt="Michael">
+                            <span>Michael</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Sandwich">
+                    <div class="post-content">
+                        <span class="tag">Culinary</span>
+                        <h3>Experiencing Sustainable Culinary Tourism</h3>
+                        <div class="post-meta">
+                            <span>18 Jan 2024</span> &bull; <span>6 mins read</span>
+                        </div>
+                        <p>Join us on a sustainable culinary journey, exploring farm-to-table dining experiences an...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/6.jpg" alt="Sebastian Louis">
+                            <span>Sebastian Louis</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1522199755839-a2bacb67c546?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Cars on a road">
+                    <div class="post-content">
+                        <span class="tag">Lifestyle</span>
+                        <h3>Navigating the Traveler's Lifestyle</h3>
+                        <div class="post-meta">
+                            <span>17 Jan 2024</span> &bull; <span>5 mins read</span>
+                        </div>
+                        <p>Dive into the world of balancing a vibrant travel lifestyle - from managing work on the road to fi...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/women/7.jpg" alt="Arabella">
+                            <span>Arabella Smiles</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Travel essentials flat lay">
+                    <div class="post-content">
+                        <span class="tag">Tips & Hacks</span>
+                        <h3>10 Essential Packing Hacks for Stress-Free Travel</h3>
+                        <div class="post-meta">
+                            <span>12 Jan 2024</span> &bull; <span>10 mins read</span>
+                        </div>
+                        <p>Uncover the secrets to efficient packing that will revolutionize your travel experience. From mini...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/men/8.jpg" alt="Benjamin">
+                            <span>Benjamin John</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-post">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hiker on a cliff">
+                    <div class="post-content">
+                        <span class="tag">Destination</span>
+                        <h3>Adrenaline-Pumping Adventures</h3>
+                        <div class="post-meta">
+                            <span>10 Jan 2024</span> &bull; <span>10 mins read</span>
+                        </div>
+                        <p>Join us on an exploration of adrenaline-pumping adventures, where breathtaking landscapes...</p>
+                        <div class="author-info">
+                            <img src="https://randomuser.me/api/portraits/women/9.jpg" alt="Calista">
+                            <span>Calista Platt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a href="#">&lt;</a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#">5</a>
+                <a href="#">&gt;</a>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="cta-block text-cta">
+                <div>
+                    <i class="fas fa-globe"></i>
+                    <h3>Explore more to get your comfort zone</h3>
+                    <p>Book your perfect stay with us.</p>
+                </div>
+                <button>Booking Now &rarr;</button>
+            </div>
+            <div class="cta-block image-cta large-image" style="background-image: url('images/pexels-benni-fish-40038242-12418421.jpg');">
+                <h3>Beyond accommodation, creating memories of a lifetime</h3>
+            </div>
+            <div class="cta-block image-cta small-image" style="background-image: url('images/pexels-fotios-photos-1438190.jpg');">
+            </div>
+            <div class="cta-block article-count-cta">
+                <div class="article-count">
+                    <p>Article Available</p>
+                    <p class="count">78</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <h2><i class="fas fa-globe-americas"></i> Horizone</h2>
+                <p>Our mission is to inspire, inform, and equip travelers with the knowledge and tools to explore the world with confidence and curiosity.</p>
+            </div>
+            <div class="footer-links">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Career</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Return</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-subscribe">
+                <h4>Get Updates</h4>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Horizone. All rights reserved.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-dribbble"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="javascript/script.js"></script>
+</body>
+</html>
