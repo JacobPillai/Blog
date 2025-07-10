@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Rental - Horizone</title>
+    <title>Blog Post - Horizone</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -24,35 +24,30 @@
             </div>
         </nav>
     </header>
-    <main class="booking-page">
-        <div class="booking-container">
-            <h1>Rent a Car for Your Trip</h1>
-            <form id="car-rental-form" class="booking-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="pickup-location">Pick-up Location</label>
-                        <input type="text" id="pickup-location" name="pickup-location" placeholder="e.g. Airport, City Center" required>
-                    </div>
+
+    <main class="single-post-page">
+        <article class="post-full-content">
+            <header class="post-header">
+                <h1 class="post-title"></h1>
+                <div class="post-meta-full">
+                    <span class="post-author"></span> &bull; <span class="post-date"></span>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="pickup-date">Pick-up Date</label>
-                        <input type="date" id="pickup-date" name="pickup-date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dropoff-date">Drop-off Date</label>
-                        <input type="date" id="dropoff-date" name="dropoff-date" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn-primary">Search Cars</button>
-            </form>
-        </div>
+            </header>
+            <figure class="post-image">
+                <img src="" alt="">
+            </figure>
+            <section class="post-content-body">
+                <!-- Full post content will be injected here by JavaScript -->
+            </section>
+        </article>
     </main>
+
     <footer>
         <div class="footer-bottom">
             <p>&copy; 2025 Horizone. All rights reserved.</p>
         </div>
     </footer>
+
     <script src="../javascript/script.js" defer></script>
 </body>
-</html>
+</html> 

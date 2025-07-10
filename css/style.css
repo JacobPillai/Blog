@@ -434,3 +434,193 @@ footer {
 .social-icons a:hover {
     background-color: #555;
 }
+
+/* Auth Pages (Login/Signup) */
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 5%;
+    min-height: 60vh;
+}
+
+.auth-container {
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.auth-container h2 {
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+.btn-primary {
+    background-color: #333;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #555;
+}
+
+.auth-switch {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.auth-switch a {
+    color: #337ab7;
+    font-weight: 500;
+}
+
+/* Booking Pages */
+.booking-page {
+    padding: 4rem 5%;
+}
+
+.booking-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.booking-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.booking-form .form-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.booking-form .form-group {
+    flex: 1;
+}
+
+/* Profile Page */
+.profile-page {
+    padding: 4rem 5%;
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.profile-header h1 {
+    margin: 0.5rem 0;
+}
+
+.profile-header p {
+    color: #666;
+}
+
+.profile-content h2 {
+    margin-bottom: 1rem;
+}
+
+/* Single Post Page */
+.single-post-page {
+    padding: 4rem 5%;
+}
+
+.post-full-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.post-full-content .post-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.post-full-content .post-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.post-full-content .post-meta-full {
+    color: #666;
+    font-size: 1rem;
+}
+
+.post-full-content .post-image {
+    margin: 2rem 0;
+}
+
+.post-full-content .post-image img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.post-content-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+.post-content-body h2 {
+    font-size: 1.8rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.post-content-body p {
+    margin-bottom: 1.5rem;
+}

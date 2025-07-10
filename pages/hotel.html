@@ -3,15 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel</title>
+    <title>Hotel Booking - Horizone</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css">
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">Horizone</div>
+            <a href="../index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <ul>
+                <li><a href="hotel.html" target="_blank">Hotel</a></li>
+                <li><a href="Flight.html" target="_blank">Flight</a></li>
+                <li><a href="Train.html" target="_blank">Train</a></li>
+                <li><a href="travel.html" target="_blank">Travel</a></li>
+                <li><a href="CarRental.html" target="_blank">Car Rental</a></li>
+            </ul>
+            <div class="nav-right">
+                <a href="Login.html" class="login">Log In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
         </nav>
     </header>
+    <main class="booking-page">
+        <div class="booking-container">
+            <h1>Find Your Perfect Hotel</h1>
+            <form id="hotel-search-form" class="booking-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="destination">Destination</label>
+                        <input type="text" id="destination" name="destination" placeholder="e.g. New York" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checkin">Check-in Date</label>
+                        <input type="date" id="checkin" name="checkin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkout">Check-out Date</label>
+                        <input type="date" id="checkout" name="checkout" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guests">Guests</label>
+                        <input type="number" id="guests" name="guests" min="1" value="1" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Search Hotels</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Horizone. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="../javascript/script.js" defer></script>
 </body>
 </html>

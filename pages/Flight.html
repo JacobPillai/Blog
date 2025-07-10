@@ -3,11 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight</title>
+    <title>Flight Booking - Horizone</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css">
 </head>
 <body>
-    
+    <header>
+        <nav>
+            <a href="../index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <ul>
+                <li><a href="hotel.html">Hotel</a></li>
+                <li><a href="Flight.html">Flight</a></li>
+                <li><a href="Train.html">Train</a></li>
+                <li><a href="travel.html">Travel</a></li>
+                <li><a href="CarRental.html">Car Rental</a></li>
+            </ul>
+            <div class="nav-right">
+                <a href="Login.html" class="login">Log In</a>
+                <a href="signup.html" class="signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+    <main class="booking-page">
+        <div class="booking-container">
+            <h1>Find Your Next Flight</h1>
+            <form id="flight-search-form" class="booking-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="from">From</label>
+                        <input type="text" id="from" name="from" placeholder="e.g. London" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">To</label>
+                        <input type="text" id="to" name="to" placeholder="e.g. Tokyo" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departure-date">Departure Date</label>
+                        <input type="date" id="departure-date" name="departure-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="return-date">Return Date</label>
+                        <input type="date" id="return-date" name="return-date">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="passengers">Passengers</label>
+                        <input type="number" id="passengers" name="passengers" min="1" value="1" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Search Flights</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Horizone. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="../javascript/script.js" defer></script>
 </body>
 </html>
