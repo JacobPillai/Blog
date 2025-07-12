@@ -2,46 +2,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const allPosts = Array.from(document.querySelectorAll('.blog-grid .blog-post'));
     const paginationContainer = document.querySelector('.pagination');
     const postsPerPage = 6;
+    let fuse; // Will be initialized later
 
-    function displayAndPaginate(posts) {
-        const pageCount = Math.ceil(posts.length / postsPerPage);
-        let currentPage = 1;
-
-        function showPage(page) {
-            allPosts.forEach(post => post.style.display = 'none');
-            const start = (page - 1) * postsPerPage;
-            const end = start + postsPerPage;
-            posts.slice(start, end).forEach(post => post.style.display = 'block');
-        }
-
-        function setupPagination() {
-            paginationContainer.innerHTML = '';
-            for (let i = 1; i <= pageCount; i++) {
-                const link = document.createElement('a');
-                link.href = '#';
-                link.innerText = i;
-                if (i === currentPage) {
-                    link.classList.add('active');
-                }
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    currentPage = i;
-                    showPage(currentPage);
-                    
-                    const currentActive = paginationContainer.querySelector('.active');
-                    if (currentActive) {
-                        currentActive.classList.remove('active');
-                    }
-                    link.classList.add('active');
-                });
-                paginationContainer.appendChild(link);
+    // Function to display a specific page of posts
+    function showPage(posts, page) {
+        allPosts.forEach(post => post.style.display = 'none');
+        const start = (page - 1) * postsPerPage;
+        const end = start + postsPerPage;
+        posts.slice(start, end).forEach(post => {
+            // Find the corresponding element in the DOM to display
+            const postElement = document.querySelector(`.blog-post[data-post-id='${post.dataset.postId}']`);
+            if (postElement) {
+                postElement.style.display = 'block';
             }
+        });
+    }
+    
+    // Function to set up pagination links
+    function setupPagination(posts) {
+        const pageCount = Math.ceil(posts.length / postsPerPage);
+        paginationContainer.innerHTML = '';
+
+        if (pageCount <= 1) return; // No pagination needed for a single page
+
+        for (let i = 1; i <= pageCount; i++) {
+            const link = document.createElement('a');
+            link.href = '#';
+            link.innerText = i;
+            if (i === 1) {
+                link.classList.add('active');
+            }
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(posts, i);
+                
+                const currentActive = paginationContainer.querySelector('.active');
+                if (currentActive) {
+                    currentActive.classList.remove('active');
+                }
+                link.classList.add('active');
+            });
+            paginationContainer.appendChild(link);
         }
-        
-        showPage(1);
-        setupPagination();
     }
 
+    // Main display function that handles filtering and pagination
+    function displayPosts(filteredPosts) {
+        showPage(filteredPosts, 1);
+        setupPagination(filteredPosts);
+    }
+    
     // Category Filter Logic
     const categoryButtons = document.querySelectorAll('.categories button');
     categoryButtons.forEach(button => {
@@ -54,93 +64,93 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? allPosts
                 : allPosts.filter(post => post.dataset.category === category);
             
-            displayAndPaginate(filteredPosts);
+            displayPosts(filteredPosts);
+            // Clear search input when a category is clicked
+            if (searchInput) searchInput.value = '';
         });
     });
 
-    // Initial Load
-    displayAndPaginate(allPosts);
+    // Form Submission Handlers for various forms
+    const forms = ['login-form', 'signup-form', 'hotel-search-form', 'flight-search-form', 'train-search-form', 'car-rental-form'];
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log(`${formId} submitted`);
+                if (formId === 'login-form') {
+                    window.location.href = 'profile.html';
+                }
+            });
+        }
+    });
 
-    // Form Submission Handlers
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Login form submitted');
-            
-            // In a real app, you would validate credentials here
-            // For now, we'll just redirect to the profile page
-            window.location.href = 'profile.html';
-        });
+    // Single Post Page Logic
+    const isPostPage = document.querySelector('.single-post-page');
+    if (isPostPage) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        const post = postsData[postId];
+
+        if (post) {
+            document.title = post.title + " - Horizone";
+            document.querySelector('.post-title').textContent = post.title;
+            document.querySelector('.post-author').textContent = post.author;
+            document.querySelector('.post-date').textContent = post.date;
+            document.querySelector('.post-image img').src = post.image;
+            document.querySelector('.post-image img').alt = post.title;
+            document.querySelector('.post-content-body').innerHTML = post.content;
+        } else {
+            document.querySelector('.post-full-content').innerHTML = '<h1>Post not found</h1><p>The article you are looking for does not exist.</p>';
+        }
     }
 
-    const signupForm = document.getElementById('signup-form');
-    if (signupForm) {
-        signupForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Signup form submitted');
-            // Here you would typically send data to a server
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
+    // Search Logic (only on index page)
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        const fuseOptions = {
+            keys: ['title', 'content'],
+            includeScore: true,
+            threshold: 0.4,
+            ignoreLocation: true,
+        };
+        // We need to map the DOM elements to a data structure Fuse can use
+        const searchablePosts = allPosts.map(postEl => {
+            const id = postEl.dataset.postId;
+            return {
+                id: id,
+                title: postsData[id]?.title,
+                content: postEl.querySelector('h3').textContent, // Search in title and preview
+            };
+        });
+        fuse = new Fuse(searchablePosts, fuseOptions);
+
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value;
+            if (query.trim() !== '') {
+                const results = fuse.search(query);
+                const resultIds = new Set(results.map(result => result.item.id));
+                const filteredPosts = allPosts.filter(postEl => resultIds.has(postEl.dataset.postId));
+                displayPosts(filteredPosts);
+                // Deactivate category button when searching
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+            } else {
+                // If search is cleared, show all posts based on 'All' category
+                document.querySelector('.categories button[data-category="All"]').click();
             }
         });
     }
 
-    const hotelSearchForm = document.getElementById('hotel-search-form');
-    if (hotelSearchForm) {
-        hotelSearchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Hotel search form submitted');
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            // In a real app, you would now fetch search results
-        });
-    }
-
-    const flightSearchForm = document.getElementById('flight-search-form');
-    if (flightSearchForm) {
-        flightSearchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Flight search form submitted');
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            // In a real app, you would now fetch search results
-        });
-    }
-
-    const trainSearchForm = document.getElementById('train-search-form');
-    if (trainSearchForm) {
-        trainSearchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Train search form submitted');
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            // In a real app, you would now fetch search results
-        });
-    }
-
-    const carRentalForm = document.getElementById('car-rental-form');
-    if (carRentalForm) {
-        carRentalForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Car rental form submitted');
-            const formData = new FormData(this);
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            // In a real app, you would now fetch search results
-        });
+    // Initial Load (if on the main page)
+    if (document.querySelector('.blog-grid')) {
+        document.querySelector('.categories button[data-category="All"]').click();
     }
 });
+
 const postsData = {
     'a-journey-through-time': {
+        id: 'a-journey-through-time',
         title: 'A Journey Through Time: The World\'s Most Beautiful Libraries',
         author: 'Dr. Evelyn Reed',
         date: '12 Jan 2025',
@@ -155,6 +165,7 @@ const postsData = {
         `
     },
     'the-art-of-slow-travel': {
+        id: 'the-art-of-slow-travel',
         title: 'The Art of Slow Travel: A Guide to Mindful Exploration',
         author: 'Marco Vance',
         date: '18 Jan 2025',
@@ -166,6 +177,7 @@ const postsData = {
         `
     },
     'hidden-culinary-gems': {
+        id: 'hidden-culinary-gems',
         title: 'Hidden Culinary Gems: Finding the Best Local Eats',
         author: 'Anya Sharma',
         date: '22 Jan 2025',
@@ -177,6 +189,7 @@ const postsData = {
         `
     },
     'urban-exploration': {
+        id: 'urban-exploration',
         title: 'Urban Exploration: Finding Adventure in the City',
         author: 'Leo Chen',
         date: '25 Jan 2025',
@@ -187,6 +200,7 @@ const postsData = {
         `
     },
     'sustainable-travel': {
+        id: 'sustainable-travel',
         title: 'Sustainable Travel: How to Be a Responsible Tourist',
         author: 'Greta Thorne',
         date: '30 Jan 2025',
@@ -197,6 +211,7 @@ const postsData = {
         `
     },
     'a-digital-nomads-guide': {
+        id: 'a-digital-nomads-guide',
         title: 'A Digital Nomad\'s Guide to Working from Anywhere',
         author: 'Alex Riley',
         date: '02 Feb 2025',
@@ -207,27 +222,3 @@ const postsData = {
         `
     }
 };
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Single Post Page Logic
-    const isPostPage = document.querySelector('.single-post-page');
-    if (isPostPage) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('id');
-        const post = postsData[postId];
-
-        if (post) {
-            document.querySelector('.post-title').textContent = post.title;
-            document.querySelector('.post-author').textContent = post.author;
-            document.querySelector('.post-date').textContent = post.date;
-            document.querySelector('.post-image img').src = post.image;
-            document.querySelector('.post-image img').alt = post.title;
-            document.querySelector('.post-content-body').innerHTML = post.content;
-            // Update the page title as well
-            document.title = post.title + " - Horizone";
-        } else {
-            // Handle case where post is not found
-            document.querySelector('.post-full-content').innerHTML = '<h1>Post not found</h1><p>The article you are looking for does not exist.</p>';
-        }
-    }
-});

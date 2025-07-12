@@ -45,23 +45,33 @@ nav ul {
     gap: 1.5rem;
 }
 
-.search-bar {
-    display: flex;
-    border: 1px solid #ccc;
+.search-container {
+    position: relative;
+}
+
+#search-input {
+    border: 1px solid #ddd;
     border-radius: 20px;
-    padding: 0.3rem 0.8rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    width: 200px;
+    padding-right: 2.5rem; /* Make space for icon */
+    transition: width 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
-.search-bar input {
-    border: none;
+#search-input:focus {
+    width: 250px;
     outline: none;
-    background: transparent;
+    border-color: #333;
 }
 
-.search-bar button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
+.search-container .fa-search {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none; /* Make icon non-interactive */
 }
 
 .login, .signup {

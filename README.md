@@ -53,32 +53,23 @@ This roadmap is divided into two major phases. Phase 1 focuses on high-impact fe
 
 ---
 
-### Phase 1: Immediate Front-End Enhancements (No Backend Required)
+### Completed Features for the blog app
+- **Individual Blog Post Pages**: Users can now click a post on the homepage to read the full article on its own dedicated page.
+- **Client-Side Search**: A search bar on the homepage now allows users to filter posts in real-time. This was implemented using Fuse.js for fuzzy search capabilities.
+
+---
+
+### Phase 1: Immediate Front-End Enhancements (No Backend Required) Plan
 
 This phase is about adding significant value and core blog features using only HTML, CSS, and client-side JavaScript.
 
-#### 1. Individual Blog Post Pages
-*   **Goal**: Allow users to click a post on the homepage and read the full article on its own dedicated page. This is a fundamental feature for any blog.
-*   **Implementation Steps**:
-    *   **Create a Page Template**: We'll design a new `post.html` file. This template will feature a large, readable area for the article text, author information, publication date, and a placeholder for a future comments section.
-    *   **Link the Posts**: On `index.html`, each blog post preview will be wrapped in a link that navigates to the new page.
-    *   **Pass Post Data**: We'll use URL parameters to tell the `post.html` page which article to display (e.g., `post.html?id=journey-through-time`).
-    *   **Dynamic Content Loading**: A script on the `post.html` page will read the `id` from the URL, find the matching post's data (which we'll temporarily store in a JavaScript object), and dynamically populate the page with the correct title, image, full content, and author details.
-
-#### 2. Client-Side Search Functionality
-*   **Goal**: Let users instantly filter the blog posts on the homepage by typing keywords into a search bar.
-*   **Implementation Steps**:
-    *   **Add Search UI**: We will add a search input field to the header in `index.html`.
-    *   **Implement Live Filtering**: Using JavaScript, we'll listen for input in the search bar. With each keystroke, the script will filter the list of available posts to only show ones where the title or content snippet matches the search term (case-insensitively).
-    *   **Update View**: The existing pagination and display logic will be reused to render the filtered results, providing a seamless and fast search experience.
-
-#### 3. Enhanced "Persistent" Profile Page
+#### 1. Enhanced "Persistent" Profile Page
 *   **Goal**: Create a more personal and continuous experience by using the browser's `localStorage` to "remember" a user's name after they sign up or log in.
 *   **Implementation Steps**:
     *   **Save User Data**: After a user fills out the signup or login form, we'll use `localStorage.setItem('username', ...)` to save their name directly in their browser.
     *   **Personalize the Profile**: When the `profile.html` page loads, it will check `localStorage` for a saved username. If one is found, it will dynamically update the page to display a personalized welcome message, like "Welcome, Theodore!".
 
-#### 4. Dark/Light Mode Toggle
+#### 2. Dark/Light Mode Toggle
 *   **Goal**: Introduce a modern UI feature that improves accessibility and user comfort by allowing them to switch between a light and dark theme.
 *   **Implementation Steps**:
     *   **Add a UI Toggle**: We'll add a theme-switcher button (e.g., with a sun/moon icon) to the main navigation.
