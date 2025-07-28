@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Image Test - Horizone</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .test-result {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <div class="nav-right">
+                <span id="user-actions">
+                    <a href="pages/Login.html" class="login">Log In</a>
+                    <a href="pages/signup.html" class="signup">Sign Up</a>
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="test-container">
+        <h1>Profile Image Feature Test</h1>
+        
+        <div class="test-section">
+            <h3>1. User Data Migration Test</h3>
+            <button class="test-button" onclick="testUserMigration()">Test User Migration</button>
+            <div id="migration-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Image Validation Test</h3>
+            <button class="test-button" onclick="testImageValidation()">Test Image Validation</button>
+            <div id="validation-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Profile Avatar Display Test</h3>
+            <button class="test-button" onclick="testAvatarDisplay()">Test Avatar Display</button>
+            <div id="avatar-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Navigation Avatar Test</h3>
+            <button class="test-button" onclick="testNavigationAvatar()">Test Navigation Avatar</button>
+            <div id="nav-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Create Test User</h3>
+            <button class="test-button" onclick="createTestUser()">Create Test User</button>
+            <button class="test-button" onclick="loginTestUser()">Login Test User</button>
+            <button class="test-button" onclick="clearTestData()">Clear Test Data</button>
+            <div id="user-result" class="test-result"></div>
+        </div>
+    </main>
+
+    <script src="javascript/posts.js"></script>
+    <script src="javascript/script.js"></script>
+    <script>
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+        }
+
+        function testUserMigration() {
+            try {
+                // Create old format user
+                const oldUsers = [{ name: 'Test User', email: 'test@example.com', password: 'test123', savedArticles: [] }];
+                localStorage.setItem('users_db', JSON.stringify(oldUsers));
+                
+                // Trigger migration
+                const migratedUsers = getUsers();
+                
+                if (migratedUsers[0].profileImage === null && migratedUsers[0].joinDate) {
+                    showResult('migration-result', 'Migration successful: profileImage and joinDate fields added');
+                } else {
+                    showResult('migration-result', 'Migration failed: fields not added correctly', false);
+                }
+            } catch (error) {
+                showResult('migration-result', `Migration error: ${error.message}`, false);
+            }
+        }
+
+        function testImageValidation() {
+            try {
+                // Test valid file
+                const validFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+                const validResult = validateProfileImageFile(validFile);
+                
+                // Test invalid file type
+                const invalidFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+                const invalidResult = validateProfileImageFile(invalidFile);
+                
+                if (validResult.valid && !invalidResult.valid) {
+                    showResult('validation-result', 'Image validation working correctly');
+                } else {
+                    showResult('validation-result', 'Image validation failed', false);
+                }
+            } catch (error) {
+                showResult('validation-result', `Validation error: ${error.message}`, false);
+            }
+        }
+
+        function testAvatarDisplay() {
+            try {
+                const testUser = { name: 'John Doe', profileImage: null };
+                const avatarWithoutImage = getUserNavigationAvatar(testUser);
+                
+                const testUserWithImage = { name: 'Jane Doe', profileImage: 'data:image/png;base64,test' };
+                const avatarWithImage = getUserNavigationAvatar(testUserWithImage);
+                
+                if (avatarWithoutImage.includes('nav-avatar-placeholder') && avatarWithImage.includes('nav-avatar')) {
+                    showResult('avatar-result', 'Avatar display functions working correctly');
+                } else {
+                    showResult('avatar-result', 'Avatar display functions failed', false);
+                }
+            } catch (error) {
+                showResult('avatar-result', `Avatar display error: ${error.message}`, false);
+            }
+        }
+
+        function testNavigationAvatar() {
+            try {
+                const currentUser = getCurrentUser();
+                if (currentUser) {
+                    updateNavBasedOnLoginState();
+                    const profileLink = document.querySelector('.profile-link');
+                    if (profileLink && (profileLink.querySelector('.nav-avatar') || profileLink.querySelector('.nav-avatar-placeholder'))) {
+                        showResult('nav-result', 'Navigation avatar displayed correctly');
+                    } else {
+                        showResult('nav-result', 'Navigation avatar not found', false);
+                    }
+                } else {
+                    showResult('nav-result', 'No user logged in - login first to test navigation avatar', false);
+                }
+            } catch (error) {
+                showResult('nav-result', `Navigation avatar error: ${error.message}`, false);
+            }
+        }
+
+        function createTestUser() {
+            try {
+                const users = getUsers();
+                const testUser = {
+                    name: 'Test User',
+                    email: 'test@horizone.com',
+                    password: 'test123',
+                    savedArticles: [],
+                    profileImage: null,
+                    joinDate: new Date().toISOString()
+                };
+                
+                // Remove existing test user
+                const filteredUsers = users.filter(u => u.email !== testUser.email);
+                filteredUsers.push(testUser);
+                setUsers(filteredUsers);
+                
+                showResult('user-result', 'Test user created successfully');
+            } catch (error) {
+                showResult('user-result', `Create user error: ${error.message}`, false);
+            }
+        }
+
+        function loginTestUser() {
+            try {
+                setCurrentUserEmail('test@horizone.com');
+                updateNavBasedOnLoginState();
+                showResult('user-result', 'Test user logged in successfully');
+            } catch (error) {
+                showResult('user-result', `Login error: ${error.message}`, false);
+            }
+        }
+
+        function clearTestData() {
+            try {
+                localStorage.removeItem('currentUserEmail');
+                const users = getUsers().filter(u => u.email !== 'test@horizone.com');
+                setUsers(users);
+                updateNavBasedOnLoginState();
+                showResult('user-result', 'Test data cleared successfully');
+            } catch (error) {
+                showResult('user-result', `Clear data error: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

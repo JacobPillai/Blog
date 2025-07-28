@@ -34,10 +34,55 @@
     <main class="profile-page">
         <div class="profile-container">
             <div class="profile-header">
-                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User Avatar" class="profile-avatar">
-                <h1>User Profile</h1> <!-- user profile containing the user's name and avatar --> 
-                <p>Joined on 15 July 2025</p> <!-- joined date, maybe could change to the date the user joined --> 
+                <div class="profile-avatar-container">
+                    <img id="profile-avatar-display" src="https://randomuser.me/api/portraits/men/75.jpg" alt="User Avatar" class="profile-avatar">
+                    <div id="profile-avatar-placeholder" class="profile-avatar-placeholder" style="display: none;">
+                        <span id="profile-avatar-initial">U</span>
+                    </div>
+                    <button id="change-avatar-btn" class="change-avatar-btn" title="Change Profile Picture">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <h1 id="profile-name">User Profile</h1> <!-- user profile containing the user's name and avatar -->
+                <p id="profile-join-date">Joined on 15 July 2025</p> <!-- joined date, maybe could change to the date the user joined -->
             </div>
+            <!-- Profile Image Upload Modal -->
+            <div id="profile-image-modal" class="profile-image-modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Change Profile Picture</h3>
+                        <button id="close-modal-btn" class="close-modal-btn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="image-upload-section">
+                            <div class="image-upload-container" id="profile-image-upload-container">
+                                <div class="image-upload-prompt">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Drag & drop an image here, or click to select a file</p>
+                                    <span>Supported formats: WEBP, PNG, JPG, JPEG, GIF, SVG, BMP, ICO (Max 2MB)</span>
+                                </div>
+                                <input type="file" id="profile-image-input" accept=".webp,.png,.jpg,.jpeg,.gif,.svg,.bmp,.ico" style="display: none;">
+                                <div id="profile-image-preview-container" class="image-preview-container" style="display: none;">
+                                    <img id="profile-image-preview" src="#" alt="Profile image preview">
+                                    <div class="image-preview-overlay">
+                                        <button type="button" id="change-image-btn" class="change-image-btn">
+                                            <i class="fas fa-edit"></i>
+                                            Choose Different Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="upload-feedback" class="upload-feedback"></div>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="save-profile-image-btn" class="btn-primary" disabled>Save Profile Picture</button>
+                            <button id="remove-profile-image-btn" class="btn-secondary">Remove Current Picture</button>
+                            <button id="cancel-upload-btn" class="btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="profile-content">
                 <div class="profile-actions">
                     <a href="create-post.html" class="btn-primary">Create New Post</a>

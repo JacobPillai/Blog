@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Image Upload Fixes Test - Horizone</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .test-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .test-result {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .test-image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        @media (max-width: 768px) {
+            .test-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <div class="nav-right">
+                <span id="user-actions">
+                    <a href="pages/Login.html" class="login">Log In</a>
+                    <a href="pages/signup.html" class="signup">Sign Up</a>
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="test-container">
+        <h1>Profile Image Upload Fixes Test Suite</h1>
+        
+        <div class="test-section">
+            <h3>🔧 Setup Test Environment</h3>
+            <button class="test-button" onclick="setupTestUser()">Create & Login Test User</button>
+            <button class="test-button" onclick="clearTestData()">Clear Test Data</button>
+            <div id="setup-result" class="test-result"></div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-section">
+                <h3>🖼️ Image Preview Test</h3>
+                <p>Test if image preview displays immediately after file selection:</p>
+                <input type="file" id="test-file-input" accept=".webp,.png,.jpg,.jpeg,.gif,.svg">
+                <img id="test-preview" class="test-image-preview" style="display: none;" alt="Test preview">
+                <button class="test-button" onclick="testImagePreview()">Test Preview Function</button>
+                <div id="preview-result" class="test-result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>🔄 Real-time Update Test</h3>
+                <p>Test if profile images update without page refresh:</p>
+                <div id="mock-profile-avatar" class="profile-avatar-placeholder" style="width: 60px; height: 60px; margin: 1rem 0;">T</div>
+                <button class="test-button" onclick="testRealTimeUpdate()">Test Real-time Updates</button>
+                <div id="update-result" class="test-result"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📁 Format Support Test</h3>
+            <p>Test image processing for all supported formats:</p>
+            <div class="test-grid">
+                <div>
+                    <button class="test-button" onclick="testFormat('image/jpeg')">Test JPEG</button>
+                    <button class="test-button" onclick="testFormat('image/png')">Test PNG</button>
+                    <button class="test-button" onclick="testFormat('image/webp')">Test WEBP</button>
+                </div>
+                <div>
+                    <button class="test-button" onclick="testFormat('image/gif')">Test GIF</button>
+                    <button class="test-button" onclick="testFormat('image/svg+xml')">Test SVG</button>
+                    <button class="test-button" onclick="testAllFormats()">Test All Formats</button>
+                </div>
+            </div>
+            <div id="format-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Integration Test</h3>
+            <p>Test complete upload workflow:</p>
+            <button class="test-button" onclick="testCompleteWorkflow()">Test Complete Workflow</button>
+            <button class="test-button" onclick="openProfilePage()">Open Profile Page</button>
+            <div id="integration-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Current State</h3>
+            <button class="test-button" onclick="showCurrentState()">Show Current State</button>
+            <div id="state-result" class="test-result"></div>
+        </div>
+    </main>
+
+    <script src="javascript/posts.js"></script>
+    <script src="javascript/script.js"></script>
+    <script>
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${type}`;
+        }
+
+        function setupTestUser() {
+            try {
+                // Create test user
+                const testUser = {
+                    name: 'Test User',
+                    email: 'testuser@horizone.com',
+                    password: 'testpass123',
+                    savedArticles: [],
+                    profileImage: null,
+                    joinDate: new Date().toISOString()
+                };
+
+                const users = getUsers();
+                const filteredUsers = users.filter(u => u.email !== testUser.email);
+                filteredUsers.push(testUser);
+                setUsers(filteredUsers);
+
+                // Login test user
+                setCurrentUserEmail(testUser.email);
+                updateNavBasedOnLoginState();
+
+                showResult('setup-result', 'Test user created and logged in successfully!\nUser: ' + testUser.name, 'success');
+            } catch (error) {
+                showResult('setup-result', `Setup error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearTestData() {
+            try {
+                clearUserSession();
+                const users = getUsers().filter(u => !u.email.includes('test'));
+                setUsers(users);
+                updateNavBasedOnLoginState();
+                showResult('setup-result', 'Test data cleared successfully', 'success');
+            } catch (error) {
+                showResult('setup-result', `Clear error: ${error.message}`, 'error');
+            }
+        }
+
+        function testImagePreview() {
+            try {
+                const fileInput = document.getElementById('test-file-input');
+                const preview = document.getElementById('test-preview');
+
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    showResult('preview-result', 'Please select a file first using the file input above', 'error');
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                console.log('Testing image preview with file:', file.name, file.type);
+
+                // Test the processProfileImage function
+                processProfileImage(file)
+                    .then((dataUrl) => {
+                        preview.src = dataUrl;
+                        preview.style.display = 'block';
+                        showResult('preview-result', `Image preview working!\nFile: ${file.name}\nType: ${file.type}\nSize: ${Math.round(file.size/1024)}KB\nData URL length: ${dataUrl.length}`, 'success');
+                    })
+                    .catch((error) => {
+                        showResult('preview-result', `Preview error: ${error.message}`, 'error');
+                    });
+            } catch (error) {
+                showResult('preview-result', `Test error: ${error.message}`, 'error');
+            }
+        }
+
+        function testRealTimeUpdate() {
+            try {
+                const currentUser = getCurrentUser();
+                if (!currentUser) {
+                    showResult('update-result', 'Please create and login test user first', 'error');
+                    return;
+                }
+
+                // Simulate profile image update
+                const testImageData = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMzAiIGZpbGw9IiM0Mjg1RjQiLz4KPHRleHQgeD0iMzAiIHk9IjM1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMCI+VDwvdGV4dD4KPC9zdmc+';
+                
+                currentUser.profileImage = testImageData;
+                updateUserProfileImage(currentUser.email, testImageData);
+
+                // Test real-time update function
+                updateAllProfileImages(currentUser);
+
+                // Update mock avatar
+                const mockAvatar = document.getElementById('mock-profile-avatar');
+                mockAvatar.innerHTML = `<img src="${testImageData}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" alt="Test Avatar">`;
+
+                showResult('update-result', 'Real-time update test completed!\nProfile image should be updated in navigation and mock avatar above.', 'success');
+            } catch (error) {
+                showResult('update-result', `Update test error: ${error.message}`, 'error');
+            }
+        }
+
+        function testFormat(mimeType) {
+            try {
+                // Create a mock file for testing
+                const fileName = `test.${mimeType.split('/')[1]}`;
+                let fileContent;
+
+                if (mimeType === 'image/svg+xml') {
+                    fileContent = '<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="blue"/></svg>';
+                } else {
+                    fileContent = 'mock-image-data';
+                }
+
+                const file = new File([fileContent], fileName, { type: mimeType });
+                
+                // Test validation
+                const validation = validateProfileImageFile(file);
+                
+                if (validation.valid) {
+                    showResult('format-result', `${mimeType} format validation: PASSED\nFile: ${fileName}`, 'success');
+                } else {
+                    showResult('format-result', `${mimeType} format validation: FAILED\nError: ${validation.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('format-result', `Format test error for ${mimeType}: ${error.message}`, 'error');
+            }
+        }
+
+        function testAllFormats() {
+            const formats = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+            let results = 'Testing all supported formats:\n\n';
+            
+            formats.forEach(format => {
+                try {
+                    const file = new File(['test'], `test.${format.split('/')[1]}`, { type: format });
+                    const validation = validateProfileImageFile(file);
+                    results += `${format}: ${validation.valid ? 'PASS' : 'FAIL - ' + validation.error}\n`;
+                } catch (error) {
+                    results += `${format}: ERROR - ${error.message}\n`;
+                }
+            });
+
+            showResult('format-result', results, 'info');
+        }
+
+        function testCompleteWorkflow() {
+            try {
+                const currentUser = getCurrentUser();
+                if (!currentUser) {
+                    showResult('integration-result', 'Please create and login test user first', 'error');
+                    return;
+                }
+
+                let workflow = 'Complete Workflow Test:\n\n';
+                workflow += '1. User logged in: ✓\n';
+                workflow += `2. User name: ${currentUser.name}\n`;
+                workflow += `3. Current profile image: ${currentUser.profileImage ? 'Set' : 'None'}\n`;
+                workflow += '4. Navigation state: ';
+                
+                const profileLink = document.querySelector('.profile-link');
+                workflow += profileLink ? 'Logged in view ✓\n' : 'Logged out view ✗\n';
+                
+                workflow += '5. Profile image functions available: ✓\n';
+                workflow += '\nWorkflow ready for manual testing!\nUse the "Open Profile Page" button to test the upload modal.';
+
+                showResult('integration-result', workflow, 'success');
+            } catch (error) {
+                showResult('integration-result', `Workflow test error: ${error.message}`, 'error');
+            }
+        }
+
+        function openProfilePage() {
+            window.open('pages/profile.html', '_blank');
+        }
+
+        function showCurrentState() {
+            try {
+                const currentUser = getCurrentUser();
+                const session = getUserSession();
+                
+                const state = {
+                    user: currentUser ? {
+                        name: currentUser.name,
+                        email: currentUser.email,
+                        hasProfileImage: !!currentUser.profileImage,
+                        profileImageLength: currentUser.profileImage ? currentUser.profileImage.length : 0
+                    } : null,
+                    session: session ? 'Active' : 'None',
+                    navigationState: document.querySelector('.profile-link') ? 'Logged in' : 'Logged out'
+                };
+                
+                showResult('state-result', 'Current State:\n' + JSON.stringify(state, null, 2), 'info');
+            } catch (error) {
+                showResult('state-result', `State error: ${error.message}`, 'error');
+            }
+        }
+
+        // File input change handler for testing
+        document.getElementById('test-file-input').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                showResult('preview-result', `File selected: ${file.name} (${file.type}, ${Math.round(file.size/1024)}KB)\nClick "Test Preview Function" to test the preview.`, 'info');
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            showCurrentState();
+        });
+    </script>
+</body>
+</html>

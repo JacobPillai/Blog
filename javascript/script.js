@@ -41,11 +41,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- UTILITY FUNCTIONS FOR USER MANAGEMENT ---
 
     function getUsers() {
-        return JSON.parse(localStorage.getItem('users_db') || '[]');
+        const users = JSON.parse(localStorage.getItem('users_db') || '[]');
+        // Migrate users to new structure if needed
+        return migrateUsersData(users);
     }
 
     function setUsers(users) {
         localStorage.setItem('users_db', JSON.stringify(users));
+    }
+
+    // Migration function to add new fields to existing users
+    function migrateUsersData(users) {
+        let migrationNeeded = false;
+        const migratedUsers = users.map(user => {
+            const migratedUser = { ...user };
+
+            // Add profileImage field if missing
+            if (!migratedUser.hasOwnProperty('profileImage')) {
+                migratedUser.profileImage = null;
+                migrationNeeded = true;
+            }
+
+            // Add joinDate field if missing
+            if (!migratedUser.hasOwnProperty('joinDate')) {
+                migratedUser.joinDate = new Date().toISOString();
+                migrationNeeded = true;
+            }
+
+            return migratedUser;
+        });
+
+        // Save migrated data if changes were made
+        if (migrationNeeded && migratedUsers.length > 0) {
+            localStorage.setItem('users_db', JSON.stringify(migratedUsers));
+            console.log('User data migrated to include profile image and join date fields');
+        }
+
+        return migratedUsers;
     }
 
     function getCurrentUserEmail() {
@@ -54,6 +86,87 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setCurrentUserEmail(email) {
         localStorage.setItem('currentUserEmail', email);
+        // Also set session persistence data
+        setUserSession(email);
+    }
+
+    // --- SESSION PERSISTENCE FUNCTIONS ---
+
+    function setUserSession(email) {
+        if (!email) return;
+
+        const sessionData = {
+            email: email,
+            loginTime: new Date().toISOString(),
+            lastActivity: new Date().toISOString(),
+            persistent: true
+        };
+
+        localStorage.setItem('userSession', JSON.stringify(sessionData));
+        console.log('User session created for:', email);
+    }
+
+    function getUserSession() {
+        try {
+            const sessionData = localStorage.getItem('userSession');
+            return sessionData ? JSON.parse(sessionData) : null;
+        } catch (error) {
+            console.error('Error parsing user session:', error);
+            localStorage.removeItem('userSession');
+            return null;
+        }
+    }
+
+    function updateSessionActivity() {
+        const session = getUserSession();
+        if (session) {
+            session.lastActivity = new Date().toISOString();
+            localStorage.setItem('userSession', JSON.stringify(session));
+        }
+    }
+
+    function clearUserSession() {
+        localStorage.removeItem('userSession');
+        localStorage.removeItem('currentUserEmail');
+        console.log('User session cleared');
+    }
+
+    function isSessionValid() {
+        const session = getUserSession();
+        if (!session) return false;
+
+        // Check if session is too old (optional: 30 days)
+        const sessionAge = Date.now() - new Date(session.loginTime).getTime();
+        const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+        if (sessionAge > maxAge) {
+            clearUserSession();
+            return false;
+        }
+
+        return true;
+    }
+
+    function restoreUserSession() {
+        const session = getUserSession();
+        if (session && isSessionValid()) {
+            // Verify user still exists in database
+            const users = getUsers();
+            const user = users.find(u => u.email === session.email);
+
+            if (user) {
+                localStorage.setItem('currentUserEmail', session.email);
+                updateSessionActivity();
+                console.log('User session restored for:', session.email);
+                return true;
+            } else {
+                // User no longer exists, clear session
+                clearUserSession();
+                console.log('User no longer exists, session cleared');
+                return false;
+            }
+        }
+        return false;
     }
 
     function getCurrentUser() {
@@ -83,6 +196,488 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- PROFILE IMAGE UTILITY FUNCTIONS ---
+
+    function getUserAvatar(user) {
+        if (!user) return null;
+
+        // Return profile image if exists, otherwise return null for fallback to initials
+        return user.profileImage || null;
+    }
+
+    function getUserAvatarElement(user, size = 'medium') {
+        if (!user) return null;
+
+        const sizeClasses = {
+            small: 'w-8 h-8 text-sm',
+            medium: 'w-12 h-12 text-base',
+            large: 'w-24 h-24 text-xl'
+        };
+
+        const profileImage = getUserAvatar(user);
+        const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+
+        if (profileImage) {
+            return `<img src="${profileImage}" alt="${user.name || 'User'} Avatar" class="profile-avatar ${sizeClasses[size] || sizeClasses.medium}" style="object-fit: cover;">`;
+        } else {
+            return `<div class="profile-avatar-placeholder ${sizeClasses[size] || sizeClasses.medium}">${initial}</div>`;
+        }
+    }
+
+    function updateUserProfileImage(email, imageDataUrl) {
+        const users = getUsers();
+        const userIndex = users.findIndex(u => u.email === email);
+        if (userIndex > -1) {
+            users[userIndex].profileImage = imageDataUrl;
+            setUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    function removeUserProfileImage(email) {
+        const users = getUsers();
+        const userIndex = users.findIndex(u => u.email === email);
+        if (userIndex > -1) {
+            users[userIndex].profileImage = null;
+            setUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    // --- PROFILE IMAGE PROCESSING FUNCTIONS ---
+
+    function debugImageFile(file) {
+        console.group('🔍 Image File Debug Information');
+        console.log('File name:', file.name);
+        console.log('File type:', file.type);
+        console.log('File size:', file.size, 'bytes', `(${(file.size / 1024).toFixed(2)} KB)`);
+        console.log('Last modified:', new Date(file.lastModified));
+
+        // Check file extension
+        const extension = file.name.toLowerCase().split('.').pop();
+        console.log('File extension:', extension);
+
+        // Check if MIME type matches extension
+        const expectedMimeTypes = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'svg': 'image/svg+xml'
+        };
+
+        const expectedMime = expectedMimeTypes[extension];
+        if (expectedMime && expectedMime !== file.type) {
+            console.warn('⚠️ MIME type mismatch:', `Expected ${expectedMime}, got ${file.type}`);
+        }
+
+        // Check browser support for the file type
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (file.type === 'image/webp') {
+            const webpSupported = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+            console.log('WEBP encoding support:', webpSupported ? '✅' : '❌');
+        }
+
+        console.groupEnd();
+
+        return {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            extension: extension,
+            mimeTypeMatch: !expectedMime || expectedMime === file.type
+        };
+    }
+
+    function testImageCompatibility() {
+        console.group('🧪 Browser Image Compatibility Test');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+
+        const formats = [
+            { name: 'WEBP', mime: 'image/webp' },
+            { name: 'PNG', mime: 'image/png' },
+            { name: 'JPEG', mime: 'image/jpeg' },
+            { name: 'GIF', mime: 'image/gif' },
+            { name: 'BMP', mime: 'image/bmp' }
+        ];
+
+        formats.forEach(format => {
+            try {
+                const dataUrl = canvas.toDataURL(format.mime);
+                const supported = dataUrl.indexOf(`data:${format.mime}`) === 0;
+                console.log(`${format.name} encoding:`, supported ? '✅ Supported' : '❌ Not supported');
+            } catch (error) {
+                console.log(`${format.name} encoding:`, '❌ Error testing');
+            }
+        });
+
+        console.groupEnd();
+    }
+
+    // Expose test function globally for debugging
+    window.testImageCompatibility = testImageCompatibility;
+
+    function validateProfileImageFile(file) {
+        // Expanded list of supported MIME types including variations
+        const validTypes = [
+            'image/webp',
+            'image/png',
+            'image/jpeg',
+            'image/jpg',  // Some browsers report this
+            'image/gif',
+            'image/svg+xml',
+            'image/bmp',  // Basic bitmap support
+            'image/x-icon', // ICO files
+            'image/vnd.microsoft.icon' // Alternative ICO MIME type
+        ];
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        const minSize = 100; // 100 bytes minimum to avoid empty files
+
+        if (!file) {
+            return { valid: false, error: 'No file selected.' };
+        }
+
+        // Check if file is actually a file object
+        if (!(file instanceof File)) {
+            return { valid: false, error: 'Invalid file object.' };
+        }
+
+        // Check file size constraints
+        if (file.size < minSize) {
+            return { valid: false, error: 'File is too small or corrupted. Please select a valid image file.' };
+        }
+
+        if (file.size > maxSize) {
+            return { valid: false, error: 'File size too large. Please select an image smaller than 2MB.' };
+        }
+
+        // Enhanced MIME type validation
+        if (!file.type) {
+            return { valid: false, error: 'Unable to determine file type. Please ensure you\'re selecting a valid image file.' };
+        }
+
+        if (!validTypes.includes(file.type)) {
+            return { valid: false, error: `Invalid file format "${file.type}". Please select a WEBP, PNG, JPG, JPEG, GIF, SVG, BMP, or ICO image.` };
+        }
+
+        // Additional file extension validation for security
+        const fileName = file.name.toLowerCase();
+        const validExtensions = ['.webp', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.ico'];
+        const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+
+        if (!hasValidExtension) {
+            return { valid: false, error: 'File extension doesn\'t match supported formats. Please ensure your file has a valid image extension.' };
+        }
+
+        // Check for suspicious file names
+        if (fileName.includes('..') || fileName.includes('/') || fileName.includes('\\')) {
+            return { valid: false, error: 'Invalid file name. Please rename your file and try again.' };
+        }
+
+        return { valid: true };
+    }
+
+    function compressImage(file, maxSizeKB = 2048, quality = 0.8) {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            // Set up timeout for image loading
+            const loadTimeout = setTimeout(() => {
+                reject(new Error('Image loading timed out. The file may be corrupted or too large.'));
+            }, 10000); // 10 second timeout
+
+            img.onload = () => {
+                clearTimeout(loadTimeout);
+
+                try {
+                    // Validate image dimensions
+                    const { width, height } = img;
+
+                    if (width === 0 || height === 0) {
+                        reject(new Error('Invalid image dimensions. The image appears to be corrupted.'));
+                        return;
+                    }
+
+                    if (width > 10000 || height > 10000) {
+                        reject(new Error('Image dimensions too large. Please use an image smaller than 10000x10000 pixels.'));
+                        return;
+                    }
+
+                    // Calculate new dimensions while maintaining aspect ratio
+                    const maxDimension = 800; // Max width or height
+                    let newWidth = width;
+                    let newHeight = height;
+
+                    if (width > height && width > maxDimension) {
+                        newHeight = (height * maxDimension) / width;
+                        newWidth = maxDimension;
+                    } else if (height > maxDimension) {
+                        newWidth = (width * maxDimension) / height;
+                        newHeight = maxDimension;
+                    }
+
+                    // Ensure dimensions are integers and not zero
+                    newWidth = Math.max(1, Math.round(newWidth));
+                    newHeight = Math.max(1, Math.round(newHeight));
+
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Clear canvas and set white background for transparency handling
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, newWidth, newHeight);
+
+                    // Draw and compress with error handling
+                    try {
+                        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                    } catch (drawError) {
+                        reject(new Error('Failed to process image. The file may be corrupted or in an unsupported format.'));
+                        return;
+                    }
+
+                    // Determine output format based on input file type
+                    let outputFormat = 'image/jpeg';
+                    let outputQuality = quality;
+
+                    // For PNG files with transparency, try to maintain PNG format
+                    if (file.type === 'image/png') {
+                        outputFormat = 'image/png';
+                        outputQuality = undefined; // PNG doesn't use quality parameter
+                    }
+                    // For WEBP files, try to maintain WEBP format if browser supports it
+                    else if (file.type === 'image/webp') {
+                        // Check if browser supports WEBP encoding
+                        try {
+                            const testCanvas = document.createElement('canvas');
+                            testCanvas.width = 1;
+                            testCanvas.height = 1;
+                            const webpTest = testCanvas.toDataURL('image/webp');
+                            const webpSupported = webpTest.indexOf('data:image/webp') === 0;
+
+                            if (webpSupported) {
+                                outputFormat = 'image/webp';
+                            }
+                        } catch (webpError) {
+                            console.warn('WEBP support test failed, falling back to JPEG');
+                        }
+                    }
+
+                    // Try different quality levels to meet size requirement
+                    let currentQuality = outputQuality;
+                    let dataUrl;
+                    let attempts = 0;
+                    const maxAttempts = 10;
+
+                    do {
+                        try {
+                            dataUrl = canvas.toDataURL(outputFormat, currentQuality);
+                            const sizeKB = Math.round((dataUrl.length * 3) / 4 / 1024); // Approximate size in KB
+
+                            if (sizeKB <= maxSizeKB || currentQuality <= 0.1 || attempts >= maxAttempts) {
+                                break;
+                            }
+
+                            currentQuality = outputFormat === 'image/png' ? undefined : Math.max(0.1, currentQuality - 0.1);
+                            attempts++;
+                        } catch (compressionError) {
+                            reject(new Error('Failed to compress image. Please try a different image.'));
+                            return;
+                        }
+                    } while (currentQuality > 0.1 && attempts < maxAttempts);
+
+                    if (!dataUrl || dataUrl === 'data:,') {
+                        reject(new Error('Failed to generate image data. Please try a different image.'));
+                        return;
+                    }
+
+                    console.log(`Image compressed: ${file.type} -> ${outputFormat}, Quality: ${currentQuality ? currentQuality.toFixed(1) : 'lossless'}`);
+                    resolve(dataUrl);
+                } catch (processingError) {
+                    reject(new Error(`Image processing failed: ${processingError.message}`));
+                }
+            };
+
+            img.onerror = (error) => {
+                clearTimeout(loadTimeout);
+                console.error('Image load error:', error);
+                reject(new Error('Failed to load image. The file may be corrupted, in an unsupported format, or too large.'));
+            };
+
+            // Create object URL with error handling
+            try {
+                const objectUrl = URL.createObjectURL(file);
+                img.src = objectUrl;
+
+                // Clean up object URL after a delay to prevent memory leaks
+                setTimeout(() => {
+                    URL.revokeObjectURL(objectUrl);
+                }, 30000);
+            } catch (urlError) {
+                clearTimeout(loadTimeout);
+                reject(new Error('Failed to process file. Please try a different image.'));
+            }
+        });
+    }
+
+    function processProfileImage(file) {
+        return new Promise((resolve, reject) => {
+            console.log('Processing profile image:', file.name, file.type, file.size);
+
+            const validation = validateProfileImageFile(file);
+            if (!validation.valid) {
+                reject(new Error(validation.error));
+                return;
+            }
+
+            // Handle special formats that need specific processing
+            if (file.type === 'image/svg+xml') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const svgContent = e.target.result;
+
+                        // Basic SVG validation
+                        if (!svgContent || typeof svgContent !== 'string') {
+                            reject(new Error('Invalid SVG file content'));
+                            return;
+                        }
+
+                        // Check if content looks like SVG
+                        if (!svgContent.trim().toLowerCase().includes('<svg')) {
+                            reject(new Error('File does not appear to be a valid SVG'));
+                            return;
+                        }
+
+                        // Remove potentially dangerous content (basic sanitization)
+                        const sanitizedSvg = svgContent
+                            .replace(/<script[^>]*>.*?<\/script>/gi, '')
+                            .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+                            .replace(/javascript:/gi, '');
+
+                        try {
+                            const dataUrl = `data:image/svg+xml;base64,${btoa(sanitizedSvg)}`;
+                            console.log('SVG processed successfully');
+                            resolve(dataUrl);
+                        } catch (encodingError) {
+                            reject(new Error('Failed to encode SVG file. The file may contain invalid characters.'));
+                        }
+                    } catch (svgError) {
+                        reject(new Error('Failed to process SVG file. Please ensure it\'s a valid SVG image.'));
+                    }
+                };
+                reader.onerror = () => reject(new Error('Failed to read SVG file. The file may be corrupted.'));
+                reader.readAsText(file);
+                return;
+            }
+
+            // Handle BMP and ICO files - these formats may need special processing
+            if (file.type === 'image/bmp' || file.type === 'image/x-icon' || file.type === 'image/vnd.microsoft.icon') {
+                console.log(`Processing ${file.type} file - will force compression to ensure compatibility`);
+
+                // For these formats, always compress to ensure browser compatibility
+                compressImage(file)
+                    .then(resolve)
+                    .catch((error) => {
+                        reject(new Error(`Failed to process ${file.type} file: ${error.message}`));
+                    });
+                return;
+            }
+
+            // For bitmap image types, use FileReader first with enhanced error handling
+            const reader = new FileReader();
+
+            // Set up timeout for file reading
+            const readTimeout = setTimeout(() => {
+                reject(new Error('File reading timed out. The file may be too large or corrupted.'));
+            }, 15000); // 15 second timeout
+
+            reader.onload = (e) => {
+                clearTimeout(readTimeout);
+
+                try {
+                    const dataUrl = e.target.result;
+
+                    if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+                        reject(new Error('Failed to read image file. The file may be corrupted.'));
+                        return;
+                    }
+
+                    const sizeKB = Math.round((dataUrl.length * 3) / 4 / 1024);
+                    console.log(`Image read: ${file.type}, Size: ${sizeKB}KB`);
+
+                    // Enhanced image validation by attempting to load it
+                    const testImg = new Image();
+                    const testTimeout = setTimeout(() => {
+                        reject(new Error('Image validation timed out. The file may be corrupted or in an unsupported format.'));
+                    }, 10000);
+
+                    testImg.onload = () => {
+                        clearTimeout(testTimeout);
+
+                        // Validate image dimensions
+                        if (testImg.width === 0 || testImg.height === 0) {
+                            reject(new Error('Invalid image dimensions. The image appears to be corrupted.'));
+                            return;
+                        }
+
+                        console.log(`Image validated: ${testImg.width}x${testImg.height}`);
+
+                        // Check if compression is needed
+                        if (sizeKB <= 2048) {
+                            console.log('Image size acceptable, using original');
+                            resolve(dataUrl);
+                        } else {
+                            console.log('Image too large, compressing...');
+                            compressImage(file)
+                                .then(resolve)
+                                .catch(reject);
+                        }
+                    };
+
+                    testImg.onerror = () => {
+                        clearTimeout(testTimeout);
+                        console.error('Image validation failed, attempting compression...');
+
+                        // Try compression as a last resort
+                        compressImage(file)
+                            .then(resolve)
+                            .catch((compressionError) => {
+                                reject(new Error(`Image processing failed: ${compressionError.message}`));
+                            });
+                    };
+
+                    testImg.src = dataUrl;
+                } catch (processingError) {
+                    clearTimeout(readTimeout);
+                    reject(new Error(`Failed to process image: ${processingError.message}`));
+                }
+            };
+
+            reader.onerror = (error) => {
+                clearTimeout(readTimeout);
+                console.error('FileReader error:', error);
+                reject(new Error('Failed to read image file. The file may be corrupted or in an unsupported format.'));
+            };
+
+            try {
+                reader.readAsDataURL(file);
+            } catch (readerError) {
+                clearTimeout(readTimeout);
+                reject(new Error('Failed to start reading file. Please try a different image.'));
+            }
+        });
+    }
+
     function getLocalPosts() {
         return JSON.parse(localStorage.getItem('user_posts') || '{}');
     }
@@ -100,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function logout() {
-        localStorage.removeItem('currentUserEmail');
+        clearUserSession();
         const homePageUrl = window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
         window.location.href = homePageUrl;
     }
@@ -152,8 +747,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (currentUser) {
             const profilePageUrl = isPagesDirectory ? 'profile.html' : 'pages/profile.html';
+            const userAvatar = getUserNavigationAvatar(currentUser);
             userActions.innerHTML = `
-                <a href="${profilePageUrl}" class="profile-link">Hello, ${currentUser.name}</a>
+                <a href="${profilePageUrl}" class="profile-link">
+                    ${userAvatar}
+                    <span>Hello, ${currentUser.name}</span>
+                </a>
                 <a href="#" class="logout-btn signup">Log Out</a>
             `;
             // Re-add event listener for the new logout button
@@ -175,25 +774,119 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // --- FORM VALIDATION AND ERROR HANDLING ---
+
+    function validateSignupForm(name, email, password, form) {
+        let isValid = true;
+
+        // Validate name
+        if (!name || name.length < 2) {
+            showFormError(form, 'name', 'Name must be at least 2 characters long.');
+            isValid = false;
+        }
+
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            showFormError(form, 'email', 'Please enter a valid email address.');
+            isValid = false;
+        }
+
+        // Validate password
+        if (!password || password.length < 6) {
+            showFormError(form, 'password', 'Password must be at least 6 characters long.');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function showFormError(form, fieldName, message) {
+        // Remove any existing error for this field
+        const existingError = form.querySelector(`.error-message[data-field="${fieldName}"]`);
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Create error message element
+        const errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        errorElement.setAttribute('data-field', fieldName);
+        errorElement.textContent = message;
+
+        if (fieldName === 'general') {
+            // Insert at the top of the form
+            form.insertBefore(errorElement, form.firstChild);
+        } else {
+            // Insert after the specific field
+            const field = form.querySelector(`#${fieldName}`);
+            if (field && field.parentNode) {
+                field.parentNode.insertBefore(errorElement, field.nextSibling);
+                field.classList.add('error');
+            }
+        }
+    }
+
+    function showFormSuccess(form, message) {
+        clearFormErrors(form);
+        const successElement = document.createElement('div');
+        successElement.className = 'success-message';
+        successElement.textContent = message;
+        form.insertBefore(successElement, form.firstChild);
+    }
+
+    function clearFormErrors(form) {
+        // Remove all error messages
+        const errorMessages = form.querySelectorAll('.error-message, .success-message');
+        errorMessages.forEach(msg => msg.remove());
+
+        // Remove error styling from fields
+        const errorFields = form.querySelectorAll('.error');
+        errorFields.forEach(field => field.classList.remove('error'));
+    }
+
     // --- FORM SUBMISSION HANDLERS ---
 
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // Clear any previous error messages
+            clearFormErrors(signupForm);
+
             const name = signupForm.querySelector('#name').value.trim();
             const email = signupForm.querySelector('#email').value.trim();
-            const password = signupForm.querySelector('#password').value; // In a real app, hash this!
+            const password = signupForm.querySelector('#password').value;
+
+            // Validate inputs
+            if (!validateSignupForm(name, email, password, signupForm)) {
+                return;
+            }
 
             const users = getUsers();
             if (users.some(u => u.email === email)) {
-                return alert('This email is already registered.');
+                showFormError(signupForm, 'email', 'This email is already registered.');
+                return;
             }
 
-            users.push({ name, email, password, savedArticles: [] });
+            const newUser = {
+                name,
+                email,
+                password,
+                savedArticles: [],
+                profileImage: null,
+                joinDate: new Date().toISOString()
+            };
+            users.push(newUser);
             setUsers(users);
             setCurrentUserEmail(email);
-            window.location.href = 'profile.html';
+
+            // Show success message before redirect
+            showFormSuccess(signupForm, 'Account created successfully! Redirecting...');
+            setTimeout(() => {
+                window.location.href = 'profile.html';
+            }, 1500);
         });
     }
 
@@ -201,17 +894,30 @@ document.addEventListener('DOMContentLoaded', function() {
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // Clear any previous error messages
+            clearFormErrors(loginForm);
+
             const email = loginForm.querySelector('#email').value.trim();
             const password = loginForm.querySelector('#password').value;
+
+            // Basic validation
+            if (!email || !password) {
+                showFormError(loginForm, 'general', 'Please fill in all fields.');
+                return;
+            }
 
             const users = getUsers();
             const user = users.find(u => u.email === email && u.password === password);
 
             if (user) {
                 setCurrentUserEmail(email);
-                window.location.href = 'profile.html';
+                showFormSuccess(loginForm, 'Login successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1000);
             } else {
-                alert('Invalid email or password.');
+                showFormError(loginForm, 'general', 'Invalid email or password.');
             }
         });
     }
@@ -282,10 +988,12 @@ document.addEventListener('DOMContentLoaded', function() {
             postComments.forEach(comment => {
                 const commentElement = document.createElement('div');
                 commentElement.classList.add('comment-item');
-                const authorInitial = comment.author ? sanitizeInput(comment.author).charAt(0).toUpperCase() : '?';
+
+                // Get comment author's profile image
+                const commentAuthorAvatar = getCommentAuthorAvatar(comment.author);
 
                 commentElement.innerHTML = `
-                    <div class="comment-avatar">${authorInitial}</div>
+                    ${commentAuthorAvatar}
                     <div class="comment-content">
                         <div class="comment-header">
                             <span class="comment-author">${sanitizeInput(comment.author)}</span>
@@ -584,13 +1292,415 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const profileNameElement = document.querySelector('.profile-header h1');
+        // Update profile information
+        updateProfileDisplay(currentUser);
+
+        // Initialize profile image upload functionality
+        initializeProfileImageUpload(currentUser);
+
+        // Initialize saved articles section
+        initializeSavedArticles(currentUser);
+    }
+
+    function updateProfileDisplay(user) {
+        // Update profile name
+        const profileNameElement = document.getElementById('profile-name');
         if (profileNameElement) {
-            profileNameElement.textContent = currentUser.name;
+            profileNameElement.textContent = user.name;
         }
 
+        // Update join date
+        const joinDateElement = document.getElementById('profile-join-date');
+        if (joinDateElement && user.joinDate) {
+            const joinDate = new Date(user.joinDate);
+            joinDateElement.textContent = `Joined on ${joinDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}`;
+        }
+
+        // Update profile avatar
+        updateProfileAvatar(user);
+    }
+
+    function updateProfileAvatar(user) {
+        const avatarDisplay = document.getElementById('profile-avatar-display');
+        const avatarPlaceholder = document.getElementById('profile-avatar-placeholder');
+        const avatarInitial = document.getElementById('profile-avatar-initial');
+
+        if (user.profileImage) {
+            // Show profile image
+            avatarDisplay.src = user.profileImage;
+            avatarDisplay.style.display = 'block';
+            avatarPlaceholder.style.display = 'none';
+        } else {
+            // Show placeholder with initial
+            avatarDisplay.style.display = 'none';
+            avatarPlaceholder.style.display = 'flex';
+            if (avatarInitial) {
+                avatarInitial.textContent = user.name ? user.name.charAt(0).toUpperCase() : '?';
+            }
+        }
+    }
+
+    function initializeProfileImageUpload(user) {
+        const changeAvatarBtn = document.getElementById('change-avatar-btn');
+        const modal = document.getElementById('profile-image-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('cancel-upload-btn');
+        const fileInput = document.getElementById('profile-image-input');
+        const uploadContainer = document.getElementById('profile-image-upload-container');
+        const imagePreview = document.getElementById('profile-image-preview');
+        const imagePreviewContainer = document.getElementById('profile-image-preview-container');
+        const uploadPrompt = uploadContainer.querySelector('.image-upload-prompt');
+        const changeImageBtn = document.getElementById('change-image-btn');
+        const saveBtn = document.getElementById('save-profile-image-btn');
+        const removeBtn = document.getElementById('remove-profile-image-btn');
+        const feedback = document.getElementById('upload-feedback');
+
+        let selectedImageData = null;
+
+        // Open modal
+        changeAvatarBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            resetUploadState();
+        });
+
+        // Close modal
+        const closeModal = () => {
+            modal.style.display = 'none';
+            resetUploadState();
+        };
+
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Change image button
+        if (changeImageBtn) {
+            changeImageBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Change image button clicked');
+                fileInput.click();
+            });
+        }
+
+        // Make preview container clickable for re-selection
+        if (imagePreviewContainer) {
+            imagePreviewContainer.addEventListener('click', (e) => {
+                // Only trigger if clicking on the overlay or the image itself
+                if (e.target === imagePreviewContainer || e.target === imagePreview || e.target.closest('.image-preview-overlay')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Preview container clicked for re-selection');
+                    fileInput.click();
+                }
+            });
+        }
+
+        // Prevent modal content clicks from bubbling up
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Close modal when clicking outside (on the backdrop)
+        modal.addEventListener('click', (e) => {
+            // Only close if clicking directly on the modal backdrop, not on any child elements
+            if (e.target === modal) {
+                console.log('Modal backdrop clicked, closing modal');
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            e.stopPropagation();
+            const file = e.target.files[0];
+            if (file) {
+                console.log('New file selected:', file.name);
+                handleImageFile(file);
+            }
+        });
+
+        // Drag and drop
+        uploadContainer.addEventListener('click', (e) => {
+            // Only trigger file input if clicking on the upload prompt area and no image is selected
+            if (!selectedImageData && e.target.closest('.image-upload-prompt')) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Upload container clicked, opening file picker');
+                fileInput.click();
+            }
+        });
+
+        uploadContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadContainer.classList.add('drag-over');
+        });
+
+        uploadContainer.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadContainer.classList.remove('drag-over');
+        });
+
+        uploadContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadContainer.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                console.log('File dropped:', file.name);
+                handleImageFile(file);
+            }
+        });
+
+        // Save profile image
+        saveBtn.addEventListener('click', () => {
+            if (selectedImageData && user.email) {
+                console.log('Saving profile image for user:', user.email);
+                const success = updateUserProfileImage(user.email, selectedImageData);
+                if (success) {
+                    // Update current user object
+                    user.profileImage = selectedImageData;
+
+                    // Update all UI components immediately
+                    updateAllProfileImages(user);
+
+                    showFeedback('Profile picture updated successfully!', 'success');
+                    setTimeout(closeModal, 1500);
+                } else {
+                    showFeedback('Failed to update profile picture. Please try again.', 'error');
+                }
+            }
+        });
+
+        // Remove profile image
+        removeBtn.addEventListener('click', () => {
+            if (user.email) {
+                console.log('Removing profile image for user:', user.email);
+                const success = removeUserProfileImage(user.email);
+                if (success) {
+                    user.profileImage = null;
+
+                    // Update all UI components immediately
+                    updateAllProfileImages(user);
+
+                    showFeedback('Profile picture removed successfully!', 'success');
+                    setTimeout(closeModal, 1500);
+                } else {
+                    showFeedback('Failed to remove profile picture. Please try again.', 'error');
+                }
+            }
+        });
+
+        function handleImageFile(file) {
+            // Debug the file first
+            const debugInfo = debugImageFile(file);
+            showFeedback('Processing image...', 'success');
+
+            // Reset any previous state
+            resetUploadState();
+
+            processProfileImage(file)
+                .then((dataUrl) => {
+                    console.log('Profile image processed successfully, data URL length:', dataUrl.length);
+                    selectedImageData = dataUrl;
+
+                    // Update image preview with enhanced error handling
+                    if (imagePreview && imagePreviewContainer) {
+                        // Set up preview image load handlers
+                        const previewLoadTimeout = setTimeout(() => {
+                            console.error('Preview image load timeout');
+                            showFeedback('Preview failed to load. Please try a different image.', 'error');
+                            resetUploadState();
+                        }, 5000);
+
+                        imagePreview.onload = () => {
+                            clearTimeout(previewLoadTimeout);
+                            console.log('Preview image loaded successfully');
+
+                            // Show preview elements
+                            imagePreview.classList.remove('image-preview-hidden');
+                            imagePreview.style.display = 'block';
+                            imagePreviewContainer.style.display = 'block';
+
+                            // Hide upload prompt
+                            if (uploadPrompt) {
+                                uploadPrompt.style.display = 'none';
+                            }
+
+                            // Enable save button
+                            if (saveBtn) {
+                                saveBtn.disabled = false;
+                            }
+
+                            showFeedback('Image ready to save!', 'success');
+                        };
+
+                        imagePreview.onerror = () => {
+                            clearTimeout(previewLoadTimeout);
+                            console.error('Preview image failed to load');
+                            showFeedback('Preview failed to display. The image may be corrupted.', 'error');
+                            resetUploadState();
+                        };
+
+                        // Set the source to trigger loading
+                        imagePreview.src = dataUrl;
+                    } else {
+                        console.error('Image preview elements not found');
+                        showFeedback('Preview elements not found. Please refresh the page and try again.', 'error');
+                        resetUploadState();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Profile image processing error:', error);
+
+                    // Provide more specific error messages based on error content
+                    let userMessage = error.message;
+                    if (error.message.includes('timeout')) {
+                        userMessage = 'Processing timed out. Please try a smaller image or different format.';
+                    } else if (error.message.includes('corrupted')) {
+                        userMessage = 'The image appears to be corrupted. Please try a different image.';
+                    } else if (error.message.includes('dimensions')) {
+                        userMessage = 'Image dimensions are invalid. Please try a different image.';
+                    } else if (error.message.includes('format')) {
+                        userMessage = 'Unsupported image format. Please use WEBP, PNG, JPG, JPEG, GIF, SVG, BMP, or ICO.';
+                    } else if (error.message.includes('size')) {
+                        userMessage = 'Image file is too large. Please use an image smaller than 2MB.';
+                    }
+
+                    showFeedback(userMessage, 'error');
+                    resetUploadState();
+                });
+        }
+
+        function resetUploadState() {
+            console.log('Resetting upload state');
+            selectedImageData = null;
+
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+            if (imagePreview) {
+                // Clear any existing event handlers
+                imagePreview.onload = null;
+                imagePreview.onerror = null;
+
+                imagePreview.classList.add('image-preview-hidden');
+                imagePreview.style.display = 'none';
+
+                // Use a placeholder image instead of '#' to avoid broken image icon
+                imagePreview.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB2aWV3Qm94PSIwIDAgMSAxIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InRyYW5zcGFyZW50Ii8+PC9zdmc+';
+            }
+
+            if (imagePreviewContainer) {
+                imagePreviewContainer.style.display = 'none';
+            }
+
+            if (uploadPrompt) {
+                uploadPrompt.style.display = 'block';
+            }
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+            }
+
+            if (feedback) {
+                feedback.style.display = 'none';
+                feedback.textContent = '';
+                feedback.className = 'upload-feedback';
+            }
+        }
+
+        function showFeedback(message, type) {
+            feedback.textContent = message;
+            feedback.className = `upload-feedback ${type}`;
+            feedback.style.display = 'block';
+        }
+    }
+
+    function getCommentAuthorAvatar(authorName) {
+        if (!authorName) {
+            return '<div class="comment-avatar">?</div>';
+        }
+
+        // Find user by name to get their profile image
+        const users = getUsers();
+        const author = users.find(u => u.name === authorName);
+        const authorInitial = authorName.charAt(0).toUpperCase();
+
+        if (author && author.profileImage) {
+            return `<img src="${author.profileImage}" alt="${authorName} Avatar" class="comment-avatar" style="object-fit: cover;">`;
+        } else {
+            return `<div class="comment-avatar">${authorInitial}</div>`;
+        }
+    }
+
+    function getUserNavigationAvatar(user) {
+        if (!user) return '';
+
+        const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+
+        if (user.profileImage) {
+            return `<img src="${user.profileImage}" alt="${user.name} Avatar" class="nav-avatar" style="object-fit: cover;">`;
+        } else {
+            return `<div class="nav-avatar-placeholder">${initial}</div>`;
+        }
+    }
+
+    function updateAllProfileImages(user) {
+        console.log('Updating all profile images for user:', user.name);
+
+        // Update profile page avatar
+        updateProfileAvatar(user);
+
+        // Update navigation bar
+        updateNavBasedOnLoginState();
+
+        // Update any existing comments on the current page
+        updateCommentsAvatars(user);
+
+        console.log('All profile images updated successfully');
+    }
+
+    function updateCommentsAvatars(user) {
+        // Find all comment avatars for this user and update them
+        const commentItems = document.querySelectorAll('.comment-item');
+        commentItems.forEach(commentItem => {
+            const authorElement = commentItem.querySelector('.comment-author');
+            if (authorElement && authorElement.textContent.trim() === user.name) {
+                const avatarElement = commentItem.querySelector('.comment-avatar');
+                if (avatarElement) {
+                    if (user.profileImage) {
+                        // Replace with image
+                        avatarElement.outerHTML = `<img src="${user.profileImage}" alt="${user.name} Avatar" class="comment-avatar" style="object-fit: cover;">`;
+                    } else {
+                        // Replace with initial
+                        const initial = user.name ? user.name.charAt(0).toUpperCase() : '?';
+                        avatarElement.outerHTML = `<div class="comment-avatar">${initial}</div>`;
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeSavedArticles(currentUser) {
         const savedArticlesContainer = document.getElementById('saved-articles-section');
-        if (savedArticlesContainer) {
+        if (savedArticlesContainer && currentUser) {
             const allPosts = { ...postsData, ...getLocalPosts() };
             if (currentUser.savedArticles && currentUser.savedArticles.length > 0) {
                 savedArticlesContainer.innerHTML = '<h2>My Saved Articles</h2><div class="saved-articles-grid"></div>';
@@ -628,6 +1738,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize core functionality
     function initializeApp() {
+        // Restore user session if available
+        restoreUserSession();
+
         handleTheme();
         updateNavBasedOnLoginState();
         handleSaveActions();
@@ -636,6 +1749,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentUser = getCurrentUser();
         console.log('Current user on page load:', currentUser ? currentUser.name : 'Not logged in');
         console.log('Current page:', window.location.pathname);
+
+        // Update session activity periodically
+        setInterval(updateSessionActivity, 5 * 60 * 1000); // Every 5 minutes
     }
 
     // Call initialization immediately

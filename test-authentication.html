@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test - Horizone</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .test-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .test-result {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .test-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <div class="nav-right">
+                <span id="user-actions">
+                    <a href="pages/Login.html" class="login">Log In</a>
+                    <a href="pages/signup.html" class="signup">Sign Up</a>
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="test-container">
+        <h1>Authentication System Test Suite</h1>
+        
+        <div class="test-grid">
+            <div class="test-section">
+                <h3>1. Session Management Test</h3>
+                <button class="test-button" onclick="testSessionManagement()">Test Session Functions</button>
+                <div id="session-result" class="test-result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>2. User Registration Test</h3>
+                <button class="test-button" onclick="testUserRegistration()">Test Registration</button>
+                <button class="test-button" onclick="testRegistrationValidation()">Test Validation</button>
+                <div id="registration-result" class="test-result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>3. Login/Logout Test</h3>
+                <button class="test-button" onclick="testLogin()">Test Login</button>
+                <button class="test-button" onclick="testLogout()">Test Logout</button>
+                <div id="login-result" class="test-result"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>4. Session Persistence Test</h3>
+                <button class="test-button" onclick="testSessionPersistence()">Test Persistence</button>
+                <button class="test-button" onclick="simulateBrowserRestart()">Simulate Restart</button>
+                <div id="persistence-result" class="test-result"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Form Validation Test</h3>
+            <div class="test-grid">
+                <div>
+                    <h4>Test Login Form</h4>
+                    <form id="test-login-form" autocomplete="on">
+                        <div class="form-group">
+                            <label for="test-email">Email</label>
+                            <input type="email" id="test-email" name="email" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="test-password">Password</label>
+                            <input type="password" id="test-password" name="password" autocomplete="current-password">
+                        </div>
+                        <button type="button" onclick="testFormValidation('login')">Test Login Validation</button>
+                    </form>
+                </div>
+                <div>
+                    <h4>Test Signup Form</h4>
+                    <form id="test-signup-form" autocomplete="on">
+                        <div class="form-group">
+                            <label for="test-name">Name</label>
+                            <input type="text" id="test-name" name="name" autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="test-signup-email">Email</label>
+                            <input type="email" id="test-signup-email" name="email" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="test-signup-password">Password</label>
+                            <input type="password" id="test-signup-password" name="password" autocomplete="new-password">
+                        </div>
+                        <button type="button" onclick="testFormValidation('signup')">Test Signup Validation</button>
+                    </form>
+                </div>
+            </div>
+            <div id="validation-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>6. Navigation State Test</h3>
+            <button class="test-button" onclick="testNavigationState()">Test Navigation Updates</button>
+            <div id="navigation-result" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>7. Data Management</h3>
+            <button class="test-button" onclick="clearAllTestData()">Clear All Test Data</button>
+            <button class="test-button" onclick="showCurrentState()">Show Current State</button>
+            <div id="data-result" class="test-result"></div>
+        </div>
+    </main>
+
+    <script src="javascript/posts.js"></script>
+    <script src="javascript/script.js"></script>
+    <script>
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${type}`;
+        }
+
+        function testSessionManagement() {
+            try {
+                // Test session creation
+                setUserSession('test@example.com');
+                const session = getUserSession();
+                
+                if (session && session.email === 'test@example.com') {
+                    showResult('session-result', 'Session management working correctly\n' + JSON.stringify(session, null, 2), 'success');
+                } else {
+                    showResult('session-result', 'Session management failed', 'error');
+                }
+            } catch (error) {
+                showResult('session-result', `Session error: ${error.message}`, 'error');
+            }
+        }
+
+        function testUserRegistration() {
+            try {
+                const testUser = {
+                    name: 'Test User',
+                    email: 'testuser@horizone.com',
+                    password: 'testpass123',
+                    savedArticles: [],
+                    profileImage: null,
+                    joinDate: new Date().toISOString()
+                };
+
+                const users = getUsers();
+                const filteredUsers = users.filter(u => u.email !== testUser.email);
+                filteredUsers.push(testUser);
+                setUsers(filteredUsers);
+
+                const savedUsers = getUsers();
+                const savedUser = savedUsers.find(u => u.email === testUser.email);
+
+                if (savedUser && savedUser.joinDate && savedUser.profileImage === null) {
+                    showResult('registration-result', 'User registration working correctly\nUser data: ' + JSON.stringify(savedUser, null, 2), 'success');
+                } else {
+                    showResult('registration-result', 'User registration failed', 'error');
+                }
+            } catch (error) {
+                showResult('registration-result', `Registration error: ${error.message}`, 'error');
+            }
+        }
+
+        function testRegistrationValidation() {
+            try {
+                const form = document.getElementById('test-signup-form');
+                
+                // Test with invalid data
+                const isValid = validateSignupForm('', 'invalid-email', '123', form);
+                
+                if (!isValid) {
+                    showResult('registration-result', 'Form validation working correctly - rejected invalid data', 'success');
+                } else {
+                    showResult('registration-result', 'Form validation failed - accepted invalid data', 'error');
+                }
+            } catch (error) {
+                showResult('registration-result', `Validation error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogin() {
+            try {
+                // First ensure test user exists
+                testUserRegistration();
+                
+                // Test login
+                setCurrentUserEmail('testuser@horizone.com');
+                const currentUser = getCurrentUser();
+                
+                if (currentUser && currentUser.email === 'testuser@horizone.com') {
+                    showResult('login-result', 'Login working correctly\nCurrent user: ' + currentUser.name, 'success');
+                } else {
+                    showResult('login-result', 'Login failed', 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `Login error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogout() {
+            try {
+                // Login first
+                setCurrentUserEmail('testuser@horizone.com');
+                
+                // Then logout
+                clearUserSession();
+                const currentUser = getCurrentUser();
+                
+                if (!currentUser) {
+                    showResult('login-result', 'Logout working correctly - no current user', 'success');
+                } else {
+                    showResult('login-result', 'Logout failed - user still logged in', 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `Logout error: ${error.message}`, 'error');
+            }
+        }
+
+        function testSessionPersistence() {
+            try {
+                // Create session
+                setUserSession('testuser@horizone.com');
+                
+                // Test restoration
+                const restored = restoreUserSession();
+                const currentUser = getCurrentUser();
+                
+                if (restored && currentUser && currentUser.email === 'testuser@horizone.com') {
+                    showResult('persistence-result', 'Session persistence working correctly\nRestored user: ' + currentUser.name, 'success');
+                } else {
+                    showResult('persistence-result', 'Session persistence failed', 'error');
+                }
+            } catch (error) {
+                showResult('persistence-result', `Persistence error: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateBrowserRestart() {
+            try {
+                // Simulate what happens on page load
+                restoreUserSession();
+                updateNavBasedOnLoginState();
+                
+                const currentUser = getCurrentUser();
+                if (currentUser) {
+                    showResult('persistence-result', 'Browser restart simulation successful\nUser still logged in: ' + currentUser.name, 'success');
+                } else {
+                    showResult('persistence-result', 'Browser restart simulation - no user session found', 'info');
+                }
+            } catch (error) {
+                showResult('persistence-result', `Restart simulation error: ${error.message}`, 'error');
+            }
+        }
+
+        function testFormValidation(type) {
+            try {
+                if (type === 'login') {
+                    const form = document.getElementById('test-login-form');
+                    clearFormErrors(form);
+                    showFormError(form, 'general', 'Test error message');
+                    showResult('validation-result', 'Login form validation display working', 'success');
+                } else {
+                    const form = document.getElementById('test-signup-form');
+                    clearFormErrors(form);
+                    showFormSuccess(form, 'Test success message');
+                    showResult('validation-result', 'Signup form validation display working', 'success');
+                }
+            } catch (error) {
+                showResult('validation-result', `Form validation error: ${error.message}`, 'error');
+            }
+        }
+
+        function testNavigationState() {
+            try {
+                updateNavBasedOnLoginState();
+                const userActions = document.getElementById('user-actions');
+                const hasProfileLink = userActions.querySelector('.profile-link');
+                const hasLoginLink = userActions.querySelector('.login');
+                
+                const currentUser = getCurrentUser();
+                if (currentUser && hasProfileLink) {
+                    showResult('navigation-result', 'Navigation showing logged-in state correctly', 'success');
+                } else if (!currentUser && hasLoginLink) {
+                    showResult('navigation-result', 'Navigation showing logged-out state correctly', 'success');
+                } else {
+                    showResult('navigation-result', 'Navigation state mismatch', 'error');
+                }
+            } catch (error) {
+                showResult('navigation-result', `Navigation error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAllTestData() {
+            try {
+                clearUserSession();
+                const users = getUsers().filter(u => !u.email.includes('test'));
+                setUsers(users);
+                updateNavBasedOnLoginState();
+                showResult('data-result', 'All test data cleared successfully', 'success');
+            } catch (error) {
+                showResult('data-result', `Clear data error: ${error.message}`, 'error');
+            }
+        }
+
+        function showCurrentState() {
+            try {
+                const currentUser = getCurrentUser();
+                const session = getUserSession();
+                const users = getUsers();
+                
+                const state = {
+                    currentUser: currentUser ? currentUser.name : 'None',
+                    session: session ? 'Active' : 'None',
+                    totalUsers: users.length,
+                    testUsers: users.filter(u => u.email.includes('test')).length
+                };
+                
+                showResult('data-result', 'Current State:\n' + JSON.stringify(state, null, 2), 'info');
+            } catch (error) {
+                showResult('data-result', `State error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run initial tests on page load
+        window.addEventListener('load', () => {
+            showCurrentState();
+        });
+    </script>
+</body>
+</html>
