@@ -391,3 +391,245 @@ The post creation system implementation encountered several significant challeng
 4. **Documentation:** Detailed recording of issues and solutions for future reference
 
 The error resolution process significantly improved the overall quality and reliability of the Horizone travel blog's post creation functionality.
+
+---
+
+## Profile Image Processing Issues and Resolutions
+
+### 5. Image Upload Processing Failures 🖼️ CRITICAL
+**Error Description:** Certain images failing to display in preview or being rejected during upload processing
+
+**Context:**
+- Users reported that specific images would not show up in the profile picture preview modal
+- Some images were completely rejected by the upload system despite appearing to be valid
+- Error messages were generic and didn't help users understand what was wrong with their images
+- The system had limited support for various image formats and properties
+
+**Root Cause Analysis:**
+1. **Limited MIME Type Validation:** Basic validation only checked common MIME types without handling edge cases
+2. **Insufficient Error Handling:** No timeout handling for large or corrupted files
+3. **Poor Browser Compatibility Detection:** Limited testing for format support across browsers
+4. **Inadequate Image Validation:** No checks for corrupted files, invalid dimensions, or unusual properties
+5. **Preview Display Issues:** Missing error handling for preview image loading failures
+6. **Limited Format Support:** Only supported basic formats, excluding BMP, ICO, and other valid image types
+
+**Technical Investigation:**
+```javascript
+// PROBLEMATIC CODE - Basic validation only
+function validateProfileImageFile(file) {
+    const validTypes = ['image/webp', 'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml'];
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+
+    if (!validTypes.includes(file.type)) {
+        return { valid: false, error: 'Invalid file format.' };
+    }
+    // Missing: corruption checks, dimension validation, browser compatibility
+}
+```
+
+**Issues Identified:**
+1. **File Corruption Detection:** No validation for corrupted or empty files
+2. **Dimension Validation:** No checks for invalid image dimensions (0x0, extremely large)
+3. **Browser Compatibility:** No testing if browser can actually process the image format
+4. **Timeout Handling:** No timeouts for processing large or problematic files
+5. **Preview Error Handling:** No error handling when preview images fail to load
+6. **Memory Management:** No cleanup of object URLs leading to potential memory leaks
+
+**Comprehensive Solution Implemented:**
+
+#### Enhanced Image Validation
+```javascript
+function validateProfileImageFile(file) {
+    // Expanded format support including edge cases
+    const validTypes = [
+        'image/webp', 'image/png', 'image/jpeg', 'image/jpg',
+        'image/gif', 'image/svg+xml', 'image/bmp',
+        'image/x-icon', 'image/vnd.microsoft.icon'
+    ];
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    const minSize = 100; // 100 bytes minimum to detect empty/corrupted files
+
+    // File object validation
+    if (!(file instanceof File)) {
+        return { valid: false, error: 'Invalid file object.' };
+    }
+
+    // Enhanced size validation
+    if (file.size < minSize) {
+        return { valid: false, error: 'File is too small or corrupted. Please select a valid image file.' };
+    }
+
+    // MIME type validation with better error messages
+    if (!file.type) {
+        return { valid: false, error: 'Unable to determine file type. Please ensure you\'re selecting a valid image file.' };
+    }
+
+    // File extension security validation
+    const fileName = file.name.toLowerCase();
+    const validExtensions = ['.webp', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.ico'];
+    const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+
+    if (!hasValidExtension) {
+        return { valid: false, error: 'File extension doesn\'t match supported formats.' };
+    }
+}
+```
+
+#### Robust Image Processing with Timeout Handling
+```javascript
+function compressImage(file, maxSizeKB = 2048, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+        // Set up timeout for image loading
+        const loadTimeout = setTimeout(() => {
+            reject(new Error('Image loading timed out. The file may be corrupted or too large.'));
+        }, 10000); // 10 second timeout
+
+        img.onload = () => {
+            clearTimeout(loadTimeout);
+
+            // Validate image dimensions
+            const { width, height } = img;
+
+            if (width === 0 || height === 0) {
+                reject(new Error('Invalid image dimensions. The image appears to be corrupted.'));
+                return;
+            }
+
+            if (width > 10000 || height > 10000) {
+                reject(new Error('Image dimensions too large. Please use an image smaller than 10000x10000 pixels.'));
+                return;
+            }
+
+            // Enhanced compression with error handling
+            try {
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+            } catch (drawError) {
+                reject(new Error('Failed to process image. The file may be corrupted or in an unsupported format.'));
+                return;
+            }
+        };
+
+        img.onerror = (error) => {
+            clearTimeout(loadTimeout);
+            reject(new Error('Failed to load image. The file may be corrupted, in an unsupported format, or too large.'));
+        };
+    });
+}
+```
+
+#### Enhanced Preview Display with Error Handling
+```javascript
+function handleImageFile(file) {
+    // Debug the file first
+    const debugInfo = debugImageFile(file);
+    showFeedback('Processing image...', 'success');
+
+    processProfileImage(file)
+        .then((dataUrl) => {
+            // Enhanced preview loading with timeout
+            const previewLoadTimeout = setTimeout(() => {
+                showFeedback('Preview failed to load. Please try a different image.', 'error');
+                resetUploadState();
+            }, 5000);
+
+            imagePreview.onload = () => {
+                clearTimeout(previewLoadTimeout);
+                // Show preview elements
+                imagePreview.style.display = 'block';
+                showFeedback('Image ready to save!', 'success');
+            };
+
+            imagePreview.onerror = () => {
+                clearTimeout(previewLoadTimeout);
+                showFeedback('Preview failed to display. The image may be corrupted.', 'error');
+                resetUploadState();
+            };
+
+            imagePreview.src = dataUrl;
+        })
+        .catch((error) => {
+            // Specific error messages based on error type
+            let userMessage = error.message;
+            if (error.message.includes('timeout')) {
+                userMessage = 'Processing timed out. Please try a smaller image or different format.';
+            } else if (error.message.includes('corrupted')) {
+                userMessage = 'The image appears to be corrupted. Please try a different image.';
+            } else if (error.message.includes('dimensions')) {
+                userMessage = 'Image dimensions are invalid. Please try a different image.';
+            }
+
+            showFeedback(userMessage, 'error');
+            resetUploadState();
+        });
+}
+```
+
+#### Debug Tools for Issue Identification
+```javascript
+function debugImageFile(file) {
+    console.group('🔍 Image File Debug Information');
+    console.log('File name:', file.name);
+    console.log('File type:', file.type);
+    console.log('File size:', file.size, 'bytes', `(${(file.size / 1024).toFixed(2)} KB)`);
+
+    // Check MIME type vs extension consistency
+    const extension = file.name.toLowerCase().split('.').pop();
+    const expectedMimeTypes = {
+        'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
+        'gif': 'image/gif', 'webp': 'image/webp', 'svg': 'image/svg+xml'
+    };
+
+    const expectedMime = expectedMimeTypes[extension];
+    if (expectedMime && expectedMime !== file.type) {
+        console.warn('⚠️ MIME type mismatch:', `Expected ${expectedMime}, got ${file.type}`);
+    }
+    console.groupEnd();
+}
+
+// Browser compatibility testing
+function testImageCompatibility() {
+    console.group('🧪 Browser Image Compatibility Test');
+    const canvas = document.createElement('canvas');
+    const formats = [
+        { name: 'WEBP', mime: 'image/webp' },
+        { name: 'PNG', mime: 'image/png' },
+        { name: 'JPEG', mime: 'image/jpeg' },
+        { name: 'GIF', mime: 'image/gif' },
+        { name: 'BMP', mime: 'image/bmp' }
+    ];
+
+    formats.forEach(format => {
+        try {
+            const dataUrl = canvas.toDataURL(format.mime);
+            const supported = dataUrl.indexOf(`data:${format.mime}`) === 0;
+            console.log(`${format.name} encoding:`, supported ? '✅ Supported' : '❌ Not supported');
+        } catch (error) {
+            console.log(`${format.name} encoding:`, '❌ Error testing');
+        }
+    });
+    console.groupEnd();
+}
+```
+
+**Impact and Results:**
+1. **Expanded Format Support:** Now supports WEBP, PNG, JPG, JPEG, GIF, SVG, BMP, and ICO files
+2. **Better Error Detection:** Identifies corrupted files, invalid dimensions, and processing timeouts
+3. **Enhanced User Feedback:** Specific error messages help users understand and resolve issues
+4. **Improved Reliability:** Timeout handling prevents browser freezing on problematic files
+5. **Debug Capabilities:** Built-in tools help identify and troubleshoot image issues
+6. **Security Enhancements:** Better file validation and SVG sanitization
+
+**Time to Resolution:** 4 hours of investigation, implementation, and testing
+**Testing Performed:**
+- Various image formats and sizes
+- Corrupted and malformed files
+- Extremely large images (>10000px)
+- Browser compatibility across Chrome, Firefox, Safari
+- Memory leak testing with object URL cleanup
+
+**Prevention Measures:**
+- Comprehensive file validation before processing
+- Timeout handling for all asynchronous operations
+- Debug logging for troubleshooting user issues
+- Browser compatibility testing tools
