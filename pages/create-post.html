@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile - Horizone</title>
+    <title>Create New Post - Horizone</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.9.1/tinymce.min.js" referrerpolicy="origin"></script>
 </head>
 <body>
     <header>
@@ -31,25 +32,40 @@
             </div>
         </nav>
     </header>
-    <main class="profile-page">
-        <div class="profile-container">
-            <div class="profile-header">
-                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User Avatar" class="profile-avatar">
-                <h1>User Profile</h1> <!-- user profile containing the user's name and avatar --> 
-                <p>Joined on 15 July 2025</p> <!-- joined date, maybe could change to the date the user joined --> 
-            </div>
-            <div class="profile-content">
-                <div class="profile-actions">
-                    <a href="create-post.html" class="btn-primary">Create New Post</a>
+
+    <main class="booking-page create-post-page">
+        <div class="booking-container">
+            <h1>Create a New Post</h1>
+            <form id="create-post-form" class="booking-form" novalidate>
+                <div class="form-group">
+                    <label for="post-title">Post Title</label>
+                    <input type="text" id="post-title" name="post-title">
                 </div>
-                <div id="saved-articles-section">
-                    <h2>My Saved Articles</h2>
-                    <p>You have no saved articles yet.</p>
-                    <!-- Saved articles would be listed here -->
+                <div class="form-group">
+                    <label for="post-category">Category</label>
+                    <input type="text" id="post-category" name="post-category" placeholder="e.g., Travel, Food, Technology">
                 </div>
-            </div>
+                <div class="form-group">
+                    <label>Post Image</label>
+                    <div class="image-upload-container" id="image-upload-container">
+                        <div class="image-upload-prompt">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop an image here, or click to select a file</p>
+                            <span>You can also paste an image from your clipboard.</span>
+                        </div>
+                        <input type="file" id="post-image-input" accept="image/*" style="display: none;">
+                        <img id="image-preview" src="#" alt="Image preview" class="image-preview-hidden">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="post-content">Content</label>
+                    <textarea id="post-content" name="post-content" rows="10"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Publish Post</button>
+            </form>
         </div>
     </main>
+
     <footer> <!-- footer -->
         <div class="footer-content">
             <div class="footer-about">
@@ -95,7 +111,15 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        tinymce.init({
+            selector: 'textarea#post-content',
+            plugins: 'code table lists',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table'
+        });
+    </script>
     <script src="../javascript/posts.js" defer></script>
     <script src="../javascript/script.js" defer></script>
 </body>
-</html> 
+</html>

@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://jacobpillai.github.io/Blog/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Allow all search engines to index the site
+# Disallow any sensitive or unnecessary paths
+Disallow: /javascript/
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Allow indexing of main content
+Allow: /pages/
+Allow: /images/
+Allow: /index.html

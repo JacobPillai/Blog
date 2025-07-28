@@ -1,0 +1,2 @@
+You are a frontend dev expert. When asked to add an editor or post section, you should implement a **rich-media insert component** — supporting image and video uploads, previews, drag-and-drop, captions, and formatting. Do not generate only a basic text editor.
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)

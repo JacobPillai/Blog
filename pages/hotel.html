@@ -19,8 +19,15 @@
                 <li><a href="CarRental.html" target="_blank">Car Rental</a></li>
             </ul>
             <div class="nav-right">
-                <a href="Login.html" class="login">Log In</a>
-                <a href="signup.html" class="signup">Sign Up</a>
+                <span id="user-actions">
+                    <a href="Login.html" class="login">Log In</a>
+                    <a href="signup.html" class="signup">Sign Up</a>
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
             </div>
         </nav>
     </header>
@@ -54,9 +61,49 @@
             </form>
         </div>
     </main>
-    <footer>
-        <div class="footer-bottom">
+    <footer> <!-- footer -->
+        <div class="footer-content">
+            <div class="footer-about">
+                <h2><i class="fas fa-globe-americas"></i> Horizone</h2>
+                <p>Our mission is to inspire, inform, and equip travelers with the knowledge and tools to explore the world with confidence and curiosity.</p>
+            </div>
+            <div class="footer-links">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Career</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Return</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-subscribe"> <!-- footer subscribe -->
+                <h4>Get Updates</h4>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom"> <!-- footer bottom -->
             <p>&copy; 2025 Horizone. All rights reserved.</p>
+            <div class="social-icons"> <!-- social icons -->
+                <a href="https://www.dribbble.com/" target="_blank"><i class="fab fa-dribbble"></i></a>
+                <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div> <!-- privacy policy and terms of service -->
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
         </div>
     </footer>
     <script src="../javascript/script.js" defer></script>

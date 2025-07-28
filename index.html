@@ -3,36 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horizone - Blog</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Horizone - Modern Travel Blog | Travel Tips, Destinations & Adventures</title>
+    <meta name="description" content="Discover amazing travel destinations, expert tips, and inspiring stories on Horizone. Your ultimate guide to mindful exploration, sustainable travel, and unforgettable adventures around the world.">
+    <meta name="keywords" content="travel blog, travel tips, destinations, adventure travel, sustainable travel, travel guides, wanderlust, travel inspiration">
+    <meta name="author" content="Horizone Travel Blog">
+    <link rel="canonical" href="https://jacobpillai.github.io/Blog/">
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Horizone - Modern Travel Blog | Travel Tips & Destinations">
+    <meta property="og:description" content="Discover amazing travel destinations, expert tips, and inspiring stories. Your ultimate guide to mindful exploration and sustainable travel.">
+    <meta property="og:image" content="https://jacobpillai.github.io/Blog/images/pexels-benni-fish-40038242-12418421.jpg">
+    <meta property="og:url" content="https://jacobpillai.github.io/Blog/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Horizone Travel Blog">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Horizone - Modern Travel Blog | Travel Tips & Destinations">
+    <meta name="twitter:description" content="Discover amazing travel destinations, expert tips, and inspiring stories. Your ultimate guide to mindful exploration and sustainable travel.">
+    <meta name="twitter:image" content="https://jacobpillai.github.io/Blog/images/pexels-benni-fish-40038242-12418421.jpg">
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https: http:; font-src 'self' https://cdnjs.cloudflare.com;">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <header>
         <nav> <!---nav bar-containing logo, links, search bar, language, login and signup buttons-->
-            <a href="index.html" target="_blank" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
+            <a href="index.html" class="logo"><i class="fas fa-globe-americas"></i> Horizone</a>
             <ul>
-                <li><a href="pages/hotel.html" target="_blank">Hotel</a></li>
-                <li><a href="pages/Flight.html" target="_blank">Flight</a></li>
-                <li><a href="pages/Train.html" target="_blank">Train</a></li>
-                <li><a href="pages/travel.html" target="_blank">Travel</a></li>
-                <li><a href="pages/CarRental.html" target="_blank">Car Rental</a></li>
+                <li><a href="pages/hotel.html">Hotel</a></li>
+                <li><a href="pages/Flight.html">Flight</a></li>
+                <li><a href="pages/Train.html">Train</a></li>
+                <li><a href="pages/travel.html">Travel</a></li>
+                <li><a href="pages/CarRental.html">Car Rental</a></li>
             </ul>
             <div class="nav-right">
                 <div class="search-container">
                     <input type="search" id="search-input" placeholder="Search articles...">
                     <i class="fas fa-search"></i>
                 </div>
-                <div class="language">EN</div>
-                <a href="pages/Login.html" class="login">Log In</a>
-                <a href="pages/signup.html" class="signup">Sign Up</a>
+                <div class="language">EN</div> <!-- language selector -->
+                <span id="user-actions">
+                    <a href="pages/Login.html" class="login">Log In</a> <!-- login button -->
+                    <a href="pages/signup.html" class="signup">Sign Up</a> <!-- signup button -->
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
             </div>
         </nav>
     </header>
 
-    <main>
-        <section class="hero">
+    <main> <!-- main content of the page --> 
+        <section class="hero"> <!-- hero section --> 
             <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1948&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Hiker on a mountain" class="hero-bg">
             <div class="hero-content">
                 <span class="tag">Destination</span>
@@ -52,13 +83,13 @@
             </div>
         </section>
 
-        <section class="blog-section">
+        <section class="blog-section"> <!-- blog section --> 
             <div class="blog-intro">
                 <h2>Blog</h2>
                 <p>Here, we share travel tips, destination guides, and stories that inspire your next adventure.</p>
             </div>
 
-            <div class="blog-filters">
+            <div class="blog-filters"> <!-- blog filters --> 
                 <div class="categories">
                     <button class="active">All</button>
                     <button>Destination</button>
@@ -75,8 +106,14 @@
                 </div>
             </div>
 
-            <div class="blog-grid">
-                <a href="pages/post.html?id=a-journey-through-time" class="blog-post" data-category="Culture" data-post-id="a-journey-through-time">
+            <div class="blog-grid"> <!-- blog grid --> 
+                <a href="pages/create-post.html" class="create-post-tile" id="create-post-tile" style="display: none;">
+                    <div class="create-post-tile-inner">
+                        <i class="fas fa-plus"></i>
+                        <span>Insert Post</span>
+                    </div>
+                </a>
+                <a href="pages/post.html?id=a-journey-through-time" class="blog-post" data-category="Destination" data-post-id="a-journey-through-time">
                     <img src="images/pexels-benni-fish-40038242-12418421.jpg" alt="A historical library">
                     <div class="post-content">
                         <span class="tag">Culture</span>
@@ -84,9 +121,15 @@
                         <div class="post-meta">
                             <span>12 Jan 2025</span> &bull; <span>5 min read</span>
                         </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
                     </div>
                 </a>
-                <a href="pages/post.html?id=the-art-of-slow-travel" class="blog-post" data-category="Travel" data-post-id="the-art-of-slow-travel">
+                <a href="pages/post.html?id=the-art-of-slow-travel" class="blog-post" data-category="Destination" data-post-id="the-art-of-slow-travel">
                     <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Scenic view of a lake and mountains">
                     <div class="post-content">
                         <span class="tag">Travel</span>
@@ -94,9 +137,15 @@
                         <div class="post-meta">
                             <span>18 Jan 2025</span> &bull; <span>7 min read</span>
                         </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
                     </div>
                 </a>
-                <a href="pages/post.html?id=hidden-culinary-gems" class="blog-post" data-category="Food" data-post-id="hidden-culinary-gems">
+                <a href="pages/post.html?id=hidden-culinary-gems" class="blog-post" data-category="Culinary" data-post-id="hidden-culinary-gems">
                     <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Close-up of a delicious meal being prepared">
                     <div class="post-content">
                         <span class="tag">Food</span>
@@ -104,15 +153,27 @@
                         <div class="post-meta">
                             <span>22 Jan 2025</span> &bull; <span>6 min read</span>
                         </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
                     </div>
                 </a>
-                <a href="pages/post.html?id=urban-exploration" class="blog-post" data-category="Adventure" data-post-id="urban-exploration">
+                <a href="pages/post.html?id=urban-exploration" class="blog-post" data-category="Destination" data-post-id="urban-exploration">
                     <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Aerial view of a bustling cityscape at dusk">
                     <div class="post-content">
                         <span class="tag">Adventure</span>
                         <h3>Urban Exploration: Finding Adventure in the City</h3>
                         <div class="post-meta">
                             <span>25 Jan 2025</span> &bull; <span>8 min read</span>
+                        </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
                         </div>
                     </div>
                 </a>
@@ -124,9 +185,15 @@
                         <div class="post-meta">
                             <span>30 Jan 2025</span> &bull; <span>5 min read</span>
                         </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
                     </div>
                 </a>
-                <a href="pages/post.html?id=a-digital-nomads-guide" class="blog-post" data-category="Technology" data-post-id="a-digital-nomads-guide">
+                <a href="pages/post.html?id=a-digital-nomads-guide" class="blog-post" data-category="Tips & Hacks" data-post-id="a-digital-nomads-guide">
                     <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A person working on a laptop in a modern co-working space">
                     <div class="post-content">
                         <span class="tag">Technology</span>
@@ -134,11 +201,67 @@
                         <div class="post-meta">
                             <span>02 Feb 2025</span> &bull; <span>9 min read</span>
                         </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <!-- travel photography tips to be added later --> 
+                <a href="pages/post.html?id=travel-photography-tips" class="blog-post" data-category="Tips & Hacks" data-post-id="travel-photography-tips">
+                    <img src="https://images.unsplash.com/photo-1455849318743-b2233052fcff?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A person holding a camera">
+                    <div class="post-content">
+                        <span class="tag">Tips & Hacks</span>
+                        <h3>Essential Photography Tips for Travelers</h3>
+                        <div class="post-meta">
+                            <span>10 Feb 2025</span> &bull; <span>6 min read</span>
+                        </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <!-- packing hacks for minimalists to be added later --> 
+                <a href="pages/post.html?id=packing-hacks-for-minimalists" class="blog-post" data-category="Tips & Hacks" data-post-id="packing-hacks-for-minimalists">
+                    <img src="https://images.unsplash.com/photo-1588862894367-ed21b6d17349?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A neatly packed suitcase">
+                    <div class="post-content">
+                        <span class="tag">Tips & Hacks</span>
+                        <h3>Packing Hacks for the Modern Minimalist</h3>
+                        <div class="post-meta">
+                            <span>15 Feb 2025</span> &bull; <span>5 min read</span>
+                        </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="pages/post.html?id=solo-travel-safety" class="blog-post" data-category="Lifestyle" data-post-id="solo-travel-safety">
+                    <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A solo traveler looking at a map">
+                    <div class="post-content">
+                        <span class="tag">Lifestyle</span>
+                        <h3>The Ultimate Guide to Safe Solo Travel</h3>
+                        <div class="post-meta">
+                            <span>20 Feb 2025</span> &bull; <span>7 min read</span>
+                        </div>
+                        <div class="post-actions" style="display: none;">
+                            <button class="options-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="options-menu">
+                                <button class="save-btn"><i class="far fa-bookmark"></i> <span>Save</span></button>
+                            </div>
+                        </div>
                     </div>
                 </a>
             </div>
 
-            <div class="pagination">
+            <div class="pagination"> <!-- pagination --> 
                 <a href="#">&lt;</a>
                 <a href="#" class="active">1</a>
                 <a href="#">2</a>
@@ -149,7 +272,7 @@
             </div>
         </section>
 
-        <section class="cta-section">
+        <section class="cta-section"> <!-- cta section --> 
             <div class="cta-block text-cta">
                 <div>
                     <i class="fas fa-globe"></i>
@@ -172,7 +295,7 @@
         </section>
     </main>
 
-    <footer>
+    <footer> <!-- footer --> 
         <div class="footer-content">
             <div class="footer-about">
                 <h2><i class="fas fa-globe-americas"></i> Horizone</h2>
@@ -194,7 +317,7 @@
                     <li><a href="#">FAQ</a></li>
                 </ul>
             </div>
-            <div class="footer-subscribe">
+            <div class="footer-subscribe"> <!-- footer subscribe --> 
                 <h4>Get Updates</h4>
                 <form class="subscribe-form">
                     <input type="email" placeholder="Enter your email">
@@ -202,23 +325,24 @@
                 </form>
             </div>
         </div>
-        <div class="footer-bottom">
+        <div class="footer-bottom"> <!-- footer bottom -->      
             <p>&copy; 2025 Horizone. All rights reserved.</p>
-            <div class="social-icons">
+            <div class="social-icons"> <!-- social icons --> 
                 <a href="https://www.dribbble.com/" target="_blank"><i class="fab fa-dribbble"></i></a>
                 <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
                 <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
             </div>
-            <div>
+            <div> <!-- privacy policy and terms of service --> 
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Service</a>
             </div>
         </div>
     </footer>
-
+ <!-- javascript functions for the blog section and the other pages--> 
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <script src="javascript/posts.js" defer></script>
     <script src="javascript/script.js" defer></script>
 </body>
 </html>

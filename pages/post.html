@@ -19,19 +19,36 @@
                 <li><a href="CarRental.html">Car Rental</a></li>
             </ul>
             <div class="nav-right">
-                <a href="Login.html" class="login">Log In</a>
-                <a href="signup.html" class="signup">Sign Up</a>
+                <span id="user-actions">
+                    <a href="Login.html" class="login">Log In</a>
+                    <a href="signup.html" class="signup">Sign Up</a>
+                </span>
+                <button id="theme-toggle" class="theme-switch" title="Toggle theme">
+                    <span class="theme-switch-thumb">
+                        <i class="fas fa-sun"></i>
+                    </span>
+                </button>
             </div>
         </nav>
     </header>
 
     <main class="single-post-page">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="../index.html#blog">Blog</a></li>
+                <li class="breadcrumb-item" aria-current="page">Article</li>
+            </ol>
+        </nav>
+
         <article class="post-full-content">
             <header class="post-header">
                 <h1 class="post-title"></h1>
                 <div class="post-meta-full">
                     <span class="post-author"></span> &bull; <span class="post-date"></span>
                 </div>
+                <button class="save-btn-single" style="display: none;"><i class="far fa-bookmark"></i> <span>Save</span></button>
             </header>
             <figure class="post-image">
                 <img src="" alt="">
@@ -40,14 +57,106 @@
                 <!-- Full post content will be injected here by JavaScript -->
             </section>
         </article>
+
+        <!-- Social Sharing Section -->
+        <section class="social-sharing" id="social-sharing">
+            <h3>Share this article</h3>
+            <div class="sharing-buttons">
+                <button class="share-btn twitter-share" data-platform="twitter" title="Share on Twitter">
+                    <i class="fab fa-twitter"></i>
+                    <span>Twitter</span>
+                </button>
+                <button class="share-btn facebook-share" data-platform="facebook" title="Share on Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </button>
+                <button class="share-btn linkedin-share" data-platform="linkedin" title="Share on LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                    <span>LinkedIn</span>
+                </button>
+                <button class="share-btn email-share" data-platform="email" title="Share via Email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
+                </button>
+                <button class="share-btn copy-link" data-platform="copy" title="Copy Link">
+                    <i class="fas fa-link"></i>
+                    <span>Copy Link</span>
+                </button>
+            </div>
+            <div class="share-feedback" id="share-feedback"></div>
+        </section>
+
+        <section class="post-comments">
+            <h2 class="section-title">Comments</h2>
+            
+            <!-- Comment Form for logged-in users -->
+            <div class="comment-form-container">
+                <form id="comment-form" style="display: none;">
+                    <h3>Leave a Comment</h3>
+                    <div class="form-group">
+                        <textarea id="comment-text" name="comment" placeholder="Join the discussion..." rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Submit Comment</button>
+                </form>
+                <p id="comment-login-prompt">
+                    Please <a href="Login.html">Log in</a> to leave a comment.
+                </p>
+            </div>
+
+            <!-- List of existing comments -->
+            <div id="comments-list" class="comments-list">
+                <!-- Comments will be injected here by JavaScript -->
+            </div>
+        </section>
     </main>
 
-    <footer>
-        <div class="footer-bottom">
+    <footer> <!-- footer -->
+        <div class="footer-content">
+            <div class="footer-about">
+                <h2><i class="fas fa-globe-americas"></i> Horizone</h2>
+                <p>Our mission is to inspire, inform, and equip travelers with the knowledge and tools to explore the world with confidence and curiosity.</p>
+            </div>
+            <div class="footer-links">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Career</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Return</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-subscribe"> <!-- footer subscribe -->
+                <h4>Get Updates</h4>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom"> <!-- footer bottom -->
             <p>&copy; 2025 Horizone. All rights reserved.</p>
+            <div class="social-icons"> <!-- social icons -->
+                <a href="https://www.dribbble.com/" target="_blank"><i class="fab fa-dribbble"></i></a>
+                <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div> <!-- privacy policy and terms of service -->
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
         </div>
     </footer>
 
+    <script src="../javascript/posts.js" defer></script>
     <script src="../javascript/script.js" defer></script>
 </body>
 </html> 
